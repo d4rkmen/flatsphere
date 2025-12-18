@@ -16,7 +16,7 @@
 #include "common_define.h"
 #include "esp_err.h"
 
-// Pin configuration for TEST185 microphone
+// Pin configuration for microphone
 #define MIC_PIN_DATA_IN 39 // SD (Serial Data)
 #define MIC_PIN_BCK 15     // SCK (Serial Clock)
 #define MIC_PIN_WS 2       // WS (Word Select)
