@@ -1,0 +1,49 @@
+dependencies:
+  espressif/usb_host_msc:
+    component_hash: 865a651c08d0bf2ce255a369778375e493df588dfb0720c3d97e12bfdcc4c0f9
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.4.1'
+    - name: espressif/usb
+      registry_url: https://components.espressif.com
+      require: public
+      rules:
+      - if: idf_version >=6.0
+      - if: target not in ["linux"]
+      version: ^1.0.0
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    targets:
+    - esp32s2
+    - esp32s3
+    - esp32p4
+    - esp32h4
+    version: 1.1.4
+  idf:
+    source:
+      type: idf
+    version: 5.5.1
+  jmattsson/picotts:
+    component_hash: b028bdbd5ef12c7fc20e2f54d534066462336608e8b19876088817e6fcc1f82c
+    dependencies: []
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.1.3
+  lvgl/lvgl:
+    component_hash: 17e68bfd21f0edf4c3ee838e2273da840bf3930e5dbc3bfa6c1190c3aed41f9f
+    dependencies: []
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 9.4.0
+direct_dependencies:
+- espressif/usb_host_msc
+- idf
+- jmattsson/picotts
+- lvgl/lvgl
+manifest_hash: 13cd43a4efa6dbcafaade8e2dd86ba8e91a5af5f0f11fa4369248f8fdea1753e
+target: esp32s3
+version: 2.0.0

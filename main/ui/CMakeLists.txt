@@ -1,0 +1,12 @@
+SET(SOURCES screens/ui_WatchFace.c
+    screens/ui_SetTime.c
+    screens/ui_SetDate.c
+    ui.c
+    components/ui_comp_hook.c
+    ui_helpers.c
+    images/ui_img_watchface360_png.c
+    images/ui_img_armhour_png.c
+    images/ui_img_armminute_png.c
+    images/ui_img_armsecond_png.c)
+
+add_library(ui ${SOURCES})
