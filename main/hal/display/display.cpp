@@ -50,10 +50,12 @@ esp_err_t Display::init()
     ESP_LOGI(TAG, "Initializing display driver...");
 
     // Initialize in sequence (I2C already initialized by HAL)
-    ESP_ERROR_CHECK(init_backlight());
     ESP_ERROR_CHECK(init_lcd());
+    ESP_ERROR_CHECK(init_backlight());
     ESP_ERROR_CHECK(init_touch());
     ESP_ERROR_CHECK(init_lvgl());
+    // Set backlight
+    set_backlight(_backlight_level);
 
     _initialized = true;
     ESP_LOGI(TAG, "Display driver initialized successfully");
@@ -201,8 +203,6 @@ esp_err_t Display::init_lcd()
     clear(0);
     ESP_ERROR_CHECK(panel_on_off(true));
 
-    // Set backlight
-    set_backlight(_backlight_level);
     ESP_LOGI(TAG, "LCD initialized successfully");
     return ESP_OK;
 }
