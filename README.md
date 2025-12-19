@@ -1,7 +1,11 @@
 # FlatSphere Clock
 
 <p align="center">
-  <img src="docs/watchface.png" alt="clock_185c Logo" width="200"/>
+  <a href="https://youtube.com/shorts/csSeqjpLOCE">
+    <img src="https://img.youtube.com/vi/csSeqjpLOCE/0.jpg" alt="Watch Demo Video" width="360"/>
+  </a>
+  <br/>
+  <i>Click to watch the demo video</i>
 </p>
 
 <p align="center">
@@ -39,8 +43,6 @@ This is demo project for WaveShare ESP32-S3 Touch LCD 1.85C board. It contains d
   <img src="docs/settime.png" alt="Set Time" width="250"/>
   <img src="docs/setdate.png" alt="Set Date" width="250"/>
 </p>
-
-<!-- TODO: Add actual screenshots -->
 
 ## Hardware
 
@@ -162,6 +164,7 @@ picoMemArea = malloc(PICO_MEM_SIZE);
 // Modified (uses SPIRAM):
 picoMemArea = heap_caps_malloc(PICO_MEM_SIZE, MALLOC_CAP_SPIRAM);
 ```
+
 **Or** set `CONFIG_SPIRAM_USE_MALLOC=y` in sdkconfig, but then PSRAM will be used for all allocations, not just TTS.
 
 This modification ensures the TTS engine utilizes the 8MB PSRAM available on the board.
