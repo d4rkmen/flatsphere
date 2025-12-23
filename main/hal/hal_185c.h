@@ -47,7 +47,7 @@ namespace HAL
             }
         }
         void init() override;
-        void playButtonSound() override { _speaker->tone(1023, 50); }
+        void playButtonSound() override { _speaker->tone(1023, 50, 0); }
         void playErrorSound() override { _speaker->playWav(error_wav_start, error_wav_end - error_wav_start); }
         void playDeviceConnectedSound() override
         {

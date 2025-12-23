@@ -277,17 +277,8 @@ extern "C" void ui_set_timezone(uint8_t index)
 
 static void on_samples(int16_t* samples, size_t size)
 {
-#if 1
-    hal.speaker()->playRaw((const int16_t*)samples, size, PICOTTS_SAMPLE_FREQ_HZ, false, 1, 0);
-#else
-    // ! important: make sure spaeker sample rate is the same as TTS sample rate
-    size_t bytes_written = 0;
-    esp_err_t err = hal.speaker()->direct_write(samples, size, &bytes_written);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to write samples: %d", err);
-    }
-#endif
+    // play to virtual channel 1
+    hal.speaker()->playRaw((const int16_t*)samples, size, PICOTTS_SAMPLE_FREQ_HZ, false, 1, 1);
 }
 
 static void say_time(struct tm* timeinfo)
@@ -397,6 +388,8 @@ esp_err_t setup()
         ESP_RETURN_ON_ERROR(esp_timer_create(&esp_timer_args, &rtc_timer), TAG, "Failed to create rtc_timer");
         ESP_RETURN_ON_ERROR(esp_timer_start_periodic(rtc_timer, TIME_ADJUSTMENT_INTERVAL * 1000), TAG, "Failed to start periodic rtc_timer");
     }
+    // set volume for keyboard sound channel
+    hal.speaker()->setChannelVolume(0, 70);
     // init battery level
     read_battery_level();
     return ESP_OK;
