@@ -312,10 +312,10 @@ static void say_time(struct tm* timeinfo)
     }
     else
     {
-        std::string hour_str = hour == 0 ? "midnight" : std::format("{}", hour_12);
+        std::string hour_str = hour == 0 ? "midnight" : std::format("{}", hour == 12 ? hour : hour_12);
         int next_hour = (hour + 1) % 24;
         int next_hour_12 = next_hour % 12;
-        std::string next_hour_str = next_hour == 0 ? "midnight" : std::format("{}", next_hour_12);
+        std::string next_hour_str = next_hour == 0 ? "midnight" : std::format("{}", next_hour == 12 ? next_hour : next_hour_12);
         if (minute == 15)
         {
             time_str = std::format("It is quarter past {}", hour_str);
