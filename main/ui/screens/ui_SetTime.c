@@ -6,20 +6,22 @@
 #include "../ui.h"
 #include "../ui_helpers.h"
 
-lv_obj_t * ui_SetTime = NULL;
-lv_obj_t * ui_RollerHours = NULL;
-lv_obj_t * ui_RollerMinutes = NULL;
-lv_obj_t * ui_LabelTime = NULL;
-lv_obj_t * ui_ButtonSaveTime = NULL;
-lv_obj_t * ui_Label2 = NULL;
-lv_obj_t * ui_ButtonTimeBack = NULL;
-lv_obj_t * ui_Label5 = NULL;
+lv_obj_t* ui_SetTime = NULL;
+lv_obj_t* ui_RollerHours = NULL;
+lv_obj_t* ui_RollerMinutes = NULL;
+lv_obj_t* ui_LabelTime = NULL;
+lv_obj_t* ui_ButtonSaveTime = NULL;
+lv_obj_t* ui_Label2 = NULL;
+lv_obj_t* ui_ButtonTimeBack = NULL;
+lv_obj_t* ui_Label5 = NULL;
 // event funtions
-void ui_event_ButtonSaveTime(lv_event_t * e)
+void ui_event_ButtonSaveTime(lv_event_t* e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
-    if(event_code == LV_EVENT_CLICKED) {
+    if (event_code == LV_EVENT_CLICKED)
+    {
+        ui_reset_last_touch();
         // Get selected time from rollers
         int hour = lv_roller_get_selected(ui_RollerHours);
         int minute = lv_roller_get_selected(ui_RollerMinutes);
@@ -31,11 +33,13 @@ void ui_event_ButtonSaveTime(lv_event_t * e)
     }
 }
 
-void ui_event_ButtonTimeBack(lv_event_t * e)
+void ui_event_ButtonTimeBack(lv_event_t* e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
-    if(event_code == LV_EVENT_CLICKED) {
+    if (event_code == LV_EVENT_CLICKED)
+    {
+        ui_reset_last_touch();
         _ui_screen_change(&ui_WatchFace, LV_SCR_LOAD_ANIM_MOVE_TOP, 250, 0, &ui_WatchFace_screen_init);
     }
 }
@@ -45,14 +49,14 @@ void ui_event_ButtonTimeBack(lv_event_t * e)
 void ui_SetTime_screen_init(void)
 {
     ui_SetTime = lv_obj_create(NULL);
-    lv_obj_remove_flag(ui_SetTime, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_remove_flag(ui_SetTime, LV_OBJ_FLAG_SCROLLABLE); /// Flags
 
     ui_RollerHours = lv_roller_create(ui_SetTime);
     lv_roller_set_options(ui_RollerHours,
                           "00\n01\n02\n03\n04\n05\n06\n07\n08\n09\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23",
                           LV_ROLLER_MODE_INFINITE);
     lv_obj_set_height(ui_RollerHours, 150);
-    lv_obj_set_width(ui_RollerHours, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_width(ui_RollerHours, LV_SIZE_CONTENT); /// 1
     lv_obj_set_x(ui_RollerHours, -40);
     lv_obj_set_y(ui_RollerHours, 0);
     lv_obj_set_align(ui_RollerHours, LV_ALIGN_CENTER);
@@ -63,15 +67,15 @@ void ui_SetTime_screen_init(void)
                           "00\n01\n02\n03\n04\n05\n06\n07\n08\n09\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50\n51\n52\n53\n54\n55\n56\n57\n58\n59",
                           LV_ROLLER_MODE_INFINITE);
     lv_obj_set_height(ui_RollerMinutes, 150);
-    lv_obj_set_width(ui_RollerMinutes, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_width(ui_RollerMinutes, LV_SIZE_CONTENT); /// 1
     lv_obj_set_x(ui_RollerMinutes, 40);
     lv_obj_set_y(ui_RollerMinutes, 0);
     lv_obj_set_align(ui_RollerMinutes, LV_ALIGN_CENTER);
     lv_obj_set_style_text_font(ui_RollerMinutes, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelTime = lv_label_create(ui_SetTime);
-    lv_obj_set_width(ui_LabelTime, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_LabelTime, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_width(ui_LabelTime, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_LabelTime, LV_SIZE_CONTENT); /// 1
     lv_obj_set_x(ui_LabelTime, 0);
     lv_obj_set_y(ui_LabelTime, -110);
     lv_obj_set_align(ui_LabelTime, LV_ALIGN_CENTER);
@@ -84,12 +88,12 @@ void ui_SetTime_screen_init(void)
     lv_obj_set_x(ui_ButtonSaveTime, 0);
     lv_obj_set_y(ui_ButtonSaveTime, 120);
     lv_obj_set_align(ui_ButtonSaveTime, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_ButtonSaveTime, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_remove_flag(ui_ButtonSaveTime, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_flag(ui_ButtonSaveTime, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+    lv_obj_remove_flag(ui_ButtonSaveTime, LV_OBJ_FLAG_SCROLLABLE);   /// Flags
 
     ui_Label2 = lv_label_create(ui_ButtonSaveTime);
-    lv_obj_set_width(ui_Label2, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Label2, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_width(ui_Label2, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_Label2, LV_SIZE_CONTENT); /// 1
     lv_obj_set_align(ui_Label2, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Label2, "OK");
     lv_obj_set_style_text_font(ui_Label2, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -100,26 +104,26 @@ void ui_SetTime_screen_init(void)
     lv_obj_set_x(ui_ButtonTimeBack, 0);
     lv_obj_set_y(ui_ButtonTimeBack, -160);
     lv_obj_set_align(ui_ButtonTimeBack, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_ButtonTimeBack, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_remove_flag(ui_ButtonTimeBack, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_flag(ui_ButtonTimeBack, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+    lv_obj_remove_flag(ui_ButtonTimeBack, LV_OBJ_FLAG_SCROLLABLE);   /// Flags
     lv_obj_set_style_bg_color(ui_ButtonTimeBack, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_ButtonTimeBack, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Label5 = lv_label_create(ui_ButtonTimeBack);
-    lv_obj_set_width(ui_Label5, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Label5, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_width(ui_Label5, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_Label5, LV_SIZE_CONTENT); /// 1
     lv_obj_set_align(ui_Label5, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Label5, "X");
     lv_obj_set_style_text_font(ui_Label5, &lv_font_montserrat_38, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_ButtonSaveTime, ui_event_ButtonSaveTime, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ButtonTimeBack, ui_event_ButtonTimeBack, LV_EVENT_ALL, NULL);
-
 }
 
 void ui_SetTime_screen_destroy(void)
 {
-    if(ui_SetTime) lv_obj_del(ui_SetTime);
+    if (ui_SetTime)
+        lv_obj_del(ui_SetTime);
 
     // NULL screen variables
     ui_SetTime = NULL;
@@ -130,5 +134,4 @@ void ui_SetTime_screen_destroy(void)
     ui_Label2 = NULL;
     ui_ButtonTimeBack = NULL;
     ui_Label5 = NULL;
-
 }

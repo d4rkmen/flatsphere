@@ -136,6 +136,8 @@ extern "C"
     int ui_get_timezone_info(uint8_t index, char* buffer, size_t buffer_size);
     bool ui_is_dst_active(void);
     void ui_set_timezone(uint8_t index);
+    void ui_open_settings(void);
+    void ui_reset_last_touch(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

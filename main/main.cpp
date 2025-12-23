@@ -23,6 +23,7 @@ static const char* TAG = "MAIN";
 
 #define BATTERY_UPDATE_INTERVAL (5 * 1000)
 #define TIME_ADJUSTMENT_INTERVAL (60 * 1000)
+#define DIM_TIMEOUT (30 * 1000)
 static const char* week_day_names[] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
 #define GREETING_NUM 8
 const char* greetings[GREETING_NUM] = {
@@ -48,7 +49,8 @@ Hal185C hal(&settings);
 static esp_timer_handle_t rtc_timer;
 static uint32_t last_timeinfo_update;
 static uint32_t last_battery_update;
-
+static uint32_t last_touch;
+static bool dim_active = false;
 // Timezone management
 static uint8_t current_timezone_index = TIMEZONE_DEFAULT_INDEX;
 
@@ -167,6 +169,11 @@ extern "C" void ui_save_date_to_rtc(int day, int month, int year)
     read_rtc_time(NULL);
 }
 
+extern "C" void ui_reset_last_touch(void)
+{
+    last_touch = millis();
+}
+
 /**
  * @brief Set timezone by index
  * @param index Timezone index (0 to TIMEZONE_COUNT-1)
@@ -273,6 +280,21 @@ extern "C" void ui_set_timezone(uint8_t index)
         // Update display with new timezone
         read_rtc_time(NULL);
     }
+}
+
+extern "C" void ui_open_settings(void)
+{
+    ui_reset_last_touch();
+    struct tm timeinfo;
+    ui_load_datetime_from_rtc(&timeinfo);
+    // ui years started from 2025
+    if (timeinfo.tm_year < (2025 - 1900))
+        timeinfo.tm_year = 2025 - 1900;
+    lv_roller_set_selected(ui_RollerDay, timeinfo.tm_mday - 1, LV_ANIM_OFF);
+    lv_roller_set_selected(ui_RollerMonth, timeinfo.tm_mon, LV_ANIM_OFF);
+    lv_roller_set_selected(ui_RollerYear, timeinfo.tm_year + 1900 - 2025, LV_ANIM_OFF);
+
+    _ui_screen_change(&ui_SetDate, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 250, 0, &ui_SetDate_screen_init);
 }
 
 static void on_samples(int16_t* samples, size_t size)
@@ -399,7 +421,7 @@ extern "C" void app_main(void)
 {
     setup();
     std::string last_week_day = "";
-
+    ui_reset_last_touch();
     while (1)
     {
         hal.display()->lvgl_timer_handler();
@@ -409,13 +431,7 @@ extern "C" void app_main(void)
             hal.playButtonSound();
             if (lv_scr_act() == ui_WatchFace)
             {
-                struct tm timeinfo;
-                ui_load_datetime_from_rtc(&timeinfo);
-                lv_roller_set_selected(ui_RollerDay, timeinfo.tm_mday - 1, LV_ANIM_OFF);
-                lv_roller_set_selected(ui_RollerMonth, timeinfo.tm_mon, LV_ANIM_OFF);
-                lv_roller_set_selected(ui_RollerYear, timeinfo.tm_year + 1900 - 2025, LV_ANIM_OFF);
-
-                _ui_screen_change(&ui_SetDate, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 250, 0, &ui_SetDate_screen_init);
+                ui_open_settings();
             }
             else
             {
@@ -450,9 +466,9 @@ extern "C" void app_main(void)
                 // set color of ui_LabelDay to red
                 lv_obj_set_style_text_color(ui_LabelDay, lv_color_hex((cur.tm_wday == 0 || cur.tm_wday == 6) ? 0xFF0000 : 0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
             }
-            if (cur.tm_sec == 0
-                // && cur.tm_min == 0)
-            )
+            if ((lv_scr_act() == ui_WatchFace) && (cur.tm_sec == 0
+                                                   // && cur.tm_min == 0)
+                                                   ))
             {
                 say_time(&cur);
             }
@@ -462,6 +478,26 @@ extern "C" void app_main(void)
         {
             read_battery_level();
             last_battery_update = now;
+        }
+        // dim timeout
+        bool new_dim_active = now - last_touch >= DIM_TIMEOUT;
+        if (dim_active != new_dim_active)
+        {
+            dim_active = new_dim_active && (lv_scr_act() == ui_WatchFace);
+            if (dim_active)
+            {
+                hal.display()->set_backlight(20);
+                hal.display()->panel_idle(true);
+                hal.display()->panel_invert_color(false);
+                lv_obj_add_flag(ui_BatteryBar, LV_OBJ_FLAG_HIDDEN);
+            }
+            else
+            {
+                hal.display()->set_backlight(settings.getNumber("system", "brightness"));
+                hal.display()->panel_idle(false);
+                hal.display()->panel_invert_color(true);
+                lv_obj_clear_flag(ui_BatteryBar, LV_OBJ_FLAG_HIDDEN);
+            }
         }
     }
 }

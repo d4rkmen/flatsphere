@@ -20,14 +20,17 @@ void ui_event_BatteryBar(lv_event_t* e)
 
     if (event_code == LV_EVENT_CLICKED)
     {
-        // load date from rtc
-        struct tm timeinfo;
-        ui_load_datetime_from_rtc(&timeinfo);
-        lv_roller_set_selected(ui_RollerDay, timeinfo.tm_mday - 1, LV_ANIM_OFF);
-        lv_roller_set_selected(ui_RollerMonth, timeinfo.tm_mon, LV_ANIM_OFF);
-        lv_roller_set_selected(ui_RollerYear, timeinfo.tm_year + 1900 - 2025, LV_ANIM_OFF);
+        ui_open_settings();
+    }
+}
 
-        _ui_screen_change(&ui_SetDate, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 250, 0, &ui_SetDate_screen_init);
+void ui_event_WatchFace(lv_event_t* e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if (event_code == LV_EVENT_CLICKED)
+    {
+        ui_reset_last_touch();
     }
 }
 
@@ -127,6 +130,7 @@ void ui_WatchFace_screen_init(void)
     lv_image_set_scale(ui_ImageArmSecond, 384);
 
     lv_obj_add_event_cb(ui_BatteryBar, ui_event_BatteryBar, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_WatchFace, ui_event_WatchFace, LV_EVENT_ALL, NULL);
 }
 
 void ui_WatchFace_screen_destroy(void)

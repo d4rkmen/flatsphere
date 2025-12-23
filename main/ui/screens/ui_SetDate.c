@@ -21,6 +21,7 @@ void ui_event_ButtonSaveDate(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
+        ui_reset_last_touch();
         // Get selected date from rollers
         int day = lv_roller_get_selected(ui_RollerDay) + 1;
         int month = lv_roller_get_selected(ui_RollerMonth) + 1;
@@ -43,6 +44,7 @@ void ui_event_ButtonDateBack(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
+        ui_reset_last_touch();
         _ui_screen_change(&ui_WatchFace, LV_SCR_LOAD_ANIM_MOVE_TOP, 250, 0, &ui_WatchFace_screen_init);
     }
 }
