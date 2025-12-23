@@ -456,10 +456,11 @@ namespace HAL
         uint8_t chmask = 1 << ch;
         if (!wav.stop_current)
         {
-            while ((_play_channel_bits.load() & chmask) && (ch_info->wavinfo[ch_info->flip].repeat))
+            // waiting for the next wave slot to be free
+            while ((_play_channel_bits.load() & chmask) && (ch_info->next()->repeat))
             {
                 // if current wav is infinite repeat, return false, new wav will never play
-                if (ch_info->wavinfo[!ch_info->flip].repeat == ~0u)
+                if (ch_info->wav()->repeat == ~0u)
                 {
                     return false;
                 }
@@ -468,7 +469,7 @@ namespace HAL
             }
         }
         // load new wav to next buffer
-        ch_info->wavinfo[ch_info->flip] = wav;
+        *(ch_info->next()) = wav;
         // set channel playing bit
         _play_channel_bits.fetch_or(chmask);
         // wake up playback task to load next wav
@@ -500,9 +501,10 @@ namespace HAL
         return true;
     }
 
-    size_t Speaker::_mix_channels(int16_t* output, size_t samples)
+    size_t Speaker::_mix_channels(size_t samples)
     {
-
+        // using same mix buffer for output
+        int16_t* output = (int16_t*)mix_buf;
         const bool out_stereo = _cfg.stereo;
         const int32_t out_rate_x256 = _cfg.sample_rate * 256;
 
@@ -686,7 +688,6 @@ namespace HAL
         Speaker* self = static_cast<Speaker*>(args);
         const size_t samples_per_frame = self->_cfg.dma_buf_len;
         const size_t buffer_size = samples_per_frame << self->_cfg.stereo;
-        int16_t* buffer = new int16_t[buffer_size];
         // Allocate int32 mixing buffer for better precision
         self->mix_buf = new int32_t[buffer_size];
 
@@ -710,12 +711,12 @@ namespace HAL
                 if (flg_nodata && 0 == buf_cnt)
                 {
                     // Fill all DMA buffers with silence
-                    memset(buffer, 0, buffer_size * sizeof(int16_t));
+                    memset(self->mix_buf, 0, buffer_size * sizeof(int32_t));
                     size_t retry = self->_cfg.dma_buf_count + 1;
                     while (!ulTaskNotifyTake(pdTRUE, 0) && --retry)
                     {
                         size_t bytes_written;
-                        i2s_channel_write(self->_tx_chan, buffer, buffer_size * sizeof(int16_t), &bytes_written, portMAX_DELAY);
+                        i2s_channel_write(self->_tx_chan, self->mix_buf, buffer_size * sizeof(int32_t), &bytes_written, portMAX_DELAY);
                     }
 
                     if (!retry)
@@ -740,12 +741,12 @@ namespace HAL
             if (self->_play_channel_bits.load() == 0)
             {
                 // No channels playing, send silence
-                memset(buffer, 0, buffer_size * sizeof(int16_t));
+                memset(self->mix_buf, 0, buffer_size * sizeof(int32_t));
             }
             else
             {
                 // Mix channels
-                mix_samples = self->_mix_channels(buffer, samples_per_frame);
+                mix_samples = self->_mix_channels(samples_per_frame);
                 flg_nodata = mix_samples == 0;
             }
 
@@ -758,7 +759,7 @@ namespace HAL
                 do
                 {
                     size_t bytes_written = 0;
-                    if (i2s_channel_write(self->_tx_chan, buffer + bytes_total, bytes_to_send - bytes_total, &bytes_written, portMAX_DELAY) == ESP_OK)
+                    if (i2s_channel_write(self->_tx_chan, self->mix_buf + bytes_total, bytes_to_send - bytes_total, &bytes_written, portMAX_DELAY) == ESP_OK)
                     {
                         bytes_total += bytes_written;
                     }
@@ -777,7 +778,6 @@ namespace HAL
             }
         }
 
-        delete[] buffer;
         delete[] self->mix_buf;
         vTaskDelete(nullptr);
     }

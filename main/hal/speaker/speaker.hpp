@@ -292,10 +292,6 @@ namespace HAL
 
             float liner_buf[2][2] = {{0, 0}, {0, 0}};
 
-            // Small preallocated buffers for streaming (e.g., 32-sample chunks)
-            static constexpr size_t tts_buf_samples = 512;
-            std::array<int16_t, tts_buf_samples> tts_buf[2];
-            size_t tts_len[2] = {0, 0};
             inline wav_info_t* wav(void) { return &wavinfo[!flip]; }
             inline wav_info_t* next(void) { return &wavinfo[flip]; }
         };
@@ -352,7 +348,7 @@ namespace HAL
         /**
          * @brief Mix audio channels
          */
-        size_t _mix_channels(int16_t* output, size_t samples);
+        size_t _mix_channels(size_t samples);
     };
 
 } // namespace HAL
