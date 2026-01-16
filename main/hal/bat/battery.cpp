@@ -13,135 +13,176 @@ using namespace HAL;
 static const char* TAG = "Battery";
 
 Battery::Battery()
-    : _adc1_handle(nullptr), _adc_cali_handle(nullptr), _do_calibration(false), _adc_raw(0), _voltage_mv(0)
+    : _adc_handle(nullptr), _adc_raw(0), _voltage_mv(0), _read_task_handle(nullptr), _running(false)
 {
     init();
 }
 
 Battery::~Battery() { deinit(); }
 
-bool Battery::_adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t* out_handle)
+bool IRAM_ATTR Battery::_adc_conv_done_callback(adc_continuous_handle_t handle, const adc_continuous_evt_data_t* edata, void* user_data)
 {
-    adc_cali_handle_t handle = NULL;
-    esp_err_t ret = ESP_FAIL;
-    bool calibrated = false;
-
-#if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
-    if (!calibrated)
+    BaseType_t mustYield = pdFALSE;
+    Battery* battery = static_cast<Battery*>(user_data);
+    if (battery && battery->_read_task_handle)
     {
-        ESP_LOGD(TAG, "calibration scheme version is %s", "Curve Fitting");
-        adc_cali_curve_fitting_config_t cali_config = {
-            .unit_id = unit,
-            .chan = channel,
-            .atten = atten,
-            .bitwidth = ADC_BITWIDTH_DEFAULT,
-        };
-        ret = adc_cali_create_scheme_curve_fitting(&cali_config, &handle);
-        if (ret == ESP_OK)
-        {
-            calibrated = true;
-        }
+        vTaskNotifyGiveFromISR(battery->_read_task_handle, &mustYield);
     }
-#endif
-
-#if ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
-    if (!calibrated)
-    {
-        ESP_LOGD(TAG, "calibration scheme version is %s", "Line Fitting");
-        adc_cali_line_fitting_config_t cali_config = {
-            .unit_id = unit,
-            .atten = atten,
-            .bitwidth = ADC_BITWIDTH_DEFAULT,
-        };
-        ret = adc_cali_create_scheme_line_fitting(&cali_config, &handle);
-        if (ret == ESP_OK)
-        {
-            calibrated = true;
-        }
-    }
-#endif
-
-    *out_handle = handle;
-    if (ret == ESP_OK)
-    {
-        ESP_LOGI(TAG, "Calibration success");
-    }
-    else if (ret == ESP_ERR_NOT_SUPPORTED || !calibrated)
-    {
-        ESP_LOGW(TAG, "eFuse not burnt, skip software calibration");
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Invalid arg or no memory");
-    }
-
-    return calibrated;
+    return (mustYield == pdTRUE);
 }
 
-void Battery::_adc_calibration_deinit(adc_cali_handle_t handle)
+void Battery::_read_task(void* arg)
 {
-#if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
-    ESP_LOGD(TAG, "deregister %s calibration scheme", "Curve Fitting");
-    ESP_ERROR_CHECK(adc_cali_delete_scheme_curve_fitting(handle));
+    Battery* battery = static_cast<Battery*>(arg);
+    esp_err_t ret;
+    uint32_t num_parsed_samples = 0;
+    adc_continuous_data_t parsed_data[NUM_SAMPLES];
 
-#elif ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
-    ESP_LOGD(TAG, "deregister %s calibration scheme", "Line Fitting");
-    ESP_ERROR_CHECK(adc_cali_delete_scheme_line_fitting(handle));
-#endif
+    while (battery->_running)
+    {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        while (1)
+        {
+            ret = adc_continuous_read_parse(battery->_adc_handle, parsed_data, NUM_SAMPLES, &num_parsed_samples, 0);
+            if (ret == ESP_OK)
+            {
+                uint32_t sum = 0;
+                uint32_t valid_count = 0;
+
+                for (int i = 0; i < num_parsed_samples; i++)
+                {
+                    if (parsed_data[i].valid)
+                    {
+                        ESP_LOGD(TAG, "ADC%d, Channel: %d, Value: %" PRIu32, parsed_data[i].unit + 1, parsed_data[i].channel, parsed_data[i].raw_data);
+                        sum += parsed_data[i].raw_data;
+                        valid_count++;
+                    }
+                    else
+                    {
+                        ESP_LOGW(TAG, "Invalid data [ADC%d_Ch%d_%" PRIu32 "]", parsed_data[i].unit + 1, parsed_data[i].channel, parsed_data[i].raw_data);
+                    }
+                }
+
+                if (valid_count > 0)
+                {
+                    battery->_adc_raw = sum / valid_count;
+                    ESP_LOGD(TAG, "Average ADC value: %" PRIu32 " (from %d valid samples)", battery->_adc_raw, valid_count);
+                }
+            }
+            else if (ret == ESP_ERR_TIMEOUT)
+            {
+                ESP_LOGD(TAG, "ADC read timeout - no more data available");
+                break;
+            }
+            else
+            {
+                ESP_LOGE(TAG, "ADC continuous read error: 0x%x", (int)ret);
+                break;
+            }
+            vTaskDelay(1);
+        }
+    }
+    ESP_LOGI(TAG, "Battery ADC read task finished");
+    vTaskDelete(NULL);
 }
 
 void Battery::init()
 {
     esp_err_t ret;
 
-    //-------------ADC1 Init---------------//
-    adc_oneshot_unit_init_cfg_t init_config1 = {
-        .unit_id = ADC_UNIT,
+    //-------------ADC Continuous Init---------------//
+    adc_continuous_handle_cfg_t adc_config = {
+        .max_store_buf_size = NUM_SAMPLES * SOC_ADC_DIGI_RESULT_BYTES * 2,
+        .conv_frame_size = NUM_SAMPLES * SOC_ADC_DIGI_RESULT_BYTES,
+        .flags = {},
     };
 
-    ret = adc_oneshot_new_unit(&init_config1, &_adc1_handle);
+    ret = adc_continuous_new_handle(&adc_config, &_adc_handle);
     if (ret != ESP_OK)
     {
-        ESP_LOGE(TAG, "adc_oneshot_new_unit failed, ret: %d", ret);
+        ESP_LOGE(TAG, "adc_continuous_new_handle failed, ret: %d", ret);
         return;
     }
 
-    //-------------ADC1 Config---------------//
-    adc_oneshot_chan_cfg_t config = {
+    //-------------ADC Continuous Config---------------//
+    adc_digi_pattern_config_t adc_pattern[1] = {{
         .atten = ADC_ATTEN,
-        .bitwidth = ADC_BITWIDTH_DEFAULT,
+        .channel = ADC_CHANNEL & 0x7,
+        .unit = ADC_UNIT,
+        .bit_width = SOC_ADC_DIGI_MAX_BITWIDTH,
+    }};
+
+    adc_continuous_config_t dig_cfg = {
+        .pattern_num = 1,
+        .adc_pattern = adc_pattern,
+        .sample_freq_hz = 1000,
+        .conv_mode = ADC_CONV_SINGLE_UNIT_1,
+        .format = ADC_DIGI_OUTPUT_FORMAT_TYPE2,
     };
-    ret = adc_oneshot_config_channel(_adc1_handle, ADC_CHANNEL, &config);
+
+    ret = adc_continuous_config(_adc_handle, &dig_cfg);
     if (ret != ESP_OK)
     {
-        ESP_LOGE(TAG, "adc_oneshot_config_channel failed, ret: %d", ret);
+        ESP_LOGE(TAG, "adc_continuous_config failed, ret: %d", ret);
         return;
     }
 
-    //-------------ADC1 Calibration Init---------------//
-    _do_calibration = _adc_calibration_init(ADC_UNIT, ADC_CHANNEL, ADC_ATTEN, &_adc_cali_handle);
+    //-------------Register Callback---------------//
+    adc_continuous_evt_cbs_t cbs = {
+        .on_conv_done = _adc_conv_done_callback,
+        .on_pool_ovf = nullptr,
+    };
+    ret = adc_continuous_register_event_callbacks(_adc_handle, &cbs, this);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "adc_continuous_register_event_callbacks failed, ret: %d", ret);
+        return;
+    }
 
-    ESP_LOGI(TAG, "Battery ADC initialized");
+    //-------------Start ADC Continuous Mode---------------//
+    _running = true;
+    ret = adc_continuous_start(_adc_handle);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "adc_continuous_start failed, ret: %d", ret);
+        _running = false;
+        return;
+    }
+
+    //-------------Create Read Task---------------//
+    xTaskCreate(_read_task, "battery_adc", 1024 * 3, this, 2, &_read_task_handle);
+
+    ESP_LOGI(TAG, "Battery ADC continuous mode initialized");
 }
 
 void Battery::deinit()
 {
-    if (_adc1_handle != nullptr)
+    if (_adc_handle != nullptr)
     {
         esp_err_t ret;
-        ret = adc_oneshot_del_unit(_adc1_handle);
+
+        // Stop continuous mode
+        _running = false;
+        ret = adc_continuous_stop(_adc_handle);
         if (ret != ESP_OK)
         {
-            ESP_LOGE(TAG, "adc_oneshot_del_unit failed, ret: %d", ret);
+            ESP_LOGE(TAG, "adc_continuous_stop failed, ret: %d", ret);
         }
-        _adc1_handle = nullptr;
-    }
 
-    if (_do_calibration && _adc_cali_handle != nullptr)
-    {
-        _adc_calibration_deinit(_adc_cali_handle);
-        _adc_cali_handle = nullptr;
-        _do_calibration = false;
+        // Wait for task to finish
+        if (_read_task_handle != nullptr)
+        {
+            vTaskDelay(pdMS_TO_TICKS(100));
+            _read_task_handle = nullptr;
+        }
+
+        // Delete handle
+        ret = adc_continuous_deinit(_adc_handle);
+        if (ret != ESP_OK)
+        {
+            ESP_LOGE(TAG, "adc_continuous_deinit failed, ret: %d", ret);
+        }
+        _adc_handle = nullptr;
     }
 
     ESP_LOGI(TAG, "Battery ADC deinitialized");
@@ -149,28 +190,14 @@ void Battery::deinit()
 
 float Battery::get_voltage()
 {
-    esp_err_t ret;
-    ret = adc_oneshot_read(_adc1_handle, ADC_CHANNEL, &_adc_raw);
-    if (ret != ESP_OK)
+    if (!_running || _adc_raw == 0)
     {
-        ESP_LOGE(TAG, "adc_oneshot_read failed, ret: %d", ret);
+        ESP_LOGW(TAG, "ADC not running or no data available");
         return 0.0f;
     }
 
-    ESP_LOGD(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT, ADC_CHANNEL, _adc_raw);
-
-    if (_do_calibration)
-    {
-        ret = adc_cali_raw_to_voltage(_adc_cali_handle, _adc_raw, &_voltage_mv);
-        if (ret != ESP_OK)
-        {
-            ESP_LOGE(TAG, "adc_cali_raw_to_voltage failed CH0, ret: %d", ret);
-            return 0.0f;
-        }
-        ESP_LOGD(TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", ADC_UNIT, ADC_CHANNEL, _voltage_mv);
-        _voltage = static_cast<float>(_voltage_mv * 3.0f / 1000.0f) / MEASUREMENT_OFFSET;
-    }
-
+    _voltage = static_cast<float>(_adc_raw / 4095.0f) * 3.3f * MEASUREMENT_OFFSET;
+    ESP_LOGI(TAG, "%.3f V", _voltage);
     return _voltage;
 }
 
