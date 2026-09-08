@@ -249,6 +249,18 @@ namespace HAL
          */
         bool render_samples(uint8_t channel, const int16_t* samples, size_t size, uint32_t sample_rate = 0);
 
+        /** Borrow PCM until the mixer consumes it, then return. Call only from
+         * a worker, with exclusive ownership of the channel. Do not stop/end
+         * the speaker concurrently. No extra utterance-sized allocation. */
+        bool playRawBlocking(uint8_t channel, const int16_t* samples, size_t size, uint32_t sample_rate);
+
+        /** Reserve a channel from automatic allocation; explicit playback is
+         * still allowed. Set before starting producers. */
+        void reserveChannel(uint8_t channel)
+        {
+            if (channel < CHANNELS_NUM) _reserved_channel_bits.fetch_or(1u << channel);
+        }
+
     private:
         Hal* _hal;
         static constexpr const size_t CHANNELS_NUM = 8;
@@ -303,6 +315,7 @@ namespace HAL
 
         volatile bool _task_running = false;
         std::atomic<uint16_t> _play_channel_bits = {0};
+        std::atomic<uint16_t> _reserved_channel_bits = {0};
 
         TaskHandle_t _task_handle = nullptr;
         volatile SemaphoreHandle_t _task_semaphore = nullptr;

@@ -2,4 +2,5 @@
 # Note: if you have increased the bootloader size, make sure to update the offsets to avoid overlap,,,,
 nvs,        data,   nvs,      0x9000,       0x6000,
 factory,    0,      0,        0x10000,      4M,
-#fs,      data,   spiffs,   ,             1M,
+# Keep existing NVS/app offsets intact. Only sanoTTS builds generate this image.
+espeak,     data,   spiffs,   0x410000,     1M,

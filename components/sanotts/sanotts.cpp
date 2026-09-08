@@ -1,0 +1,123 @@
+#include "flatsphere_sanotts.h"
+#include "snt_tts.h"
+extern "C" {
+#include "esp_g2p.h"
+}
+#include "esp_heap_caps.h"
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
+#include "freertos/task.h"
+#include <algorithm>
+#include <atomic>
+#include <cmath>
+#include <cstring>
+
+namespace {
+constexpr size_t arena_bytes = 2 * 1024 * 1024;
+constexpr size_t pcm_capacity = 640 * 256; // capped by patched runtime
+constexpr unsigned sample_rate = 22050;
+struct Request { char text[192]; };
+QueueHandle_t queue;
+std::atomic<bool> failed{false};
+void *arena;
+int16_t *audio;
+size_t audio_size;
+flatsphere_pcm_sink output;
+void *output_user;
+const char *TAG = "SANOTTS";
+extern const uint8_t front[] asm("_binary_front_q8_bin_start");
+extern const uint8_t model[] asm("_binary_model_q8_bin_start");
+
+int collect_pcm(const float *pcm, int count, void *)
+{
+    if (count < 0 || static_cast<size_t>(count) > pcm_capacity - audio_size)
+        return 1;
+    for (int i = 0; i < count; ++i)
+    {
+        if (!std::isfinite(pcm[i])) return 1;
+        audio[audio_size++] = static_cast<int16_t>(
+            std::clamp(pcm[i], -1.0f, 1.0f) * 32767.0f);
+    }
+    return 0;
+}
+
+void worker(void *)
+{
+    // G2P initialization also needs the larger worker stack, not app_main's.
+    if (esp_g2p_init() != 0)
+    {
+        failed.store(true);
+        ESP_LOGE(TAG, "G2P initialization failed; check flashed espeak partition");
+        heap_caps_free(arena);
+        heap_caps_free(audio);
+        arena = nullptr;
+        audio = nullptr;
+        vTaskDelete(nullptr);
+        return;
+    }
+    ESP_LOGI(TAG, "English Kristin ready (scalar, PSRAM); PCM %u Hz", sample_rate);
+    Request request;
+    int ids[256];
+    int32_t model_ids[256];
+    while (xQueueReceive(queue, &request, portMAX_DELAY) == pdTRUE)
+    {
+        int count = esp_g2p_text_to_ids(request.text, ids, 256);
+        if (count < 3)
+        {
+            ESP_LOGW(TAG, "Rejected utterance: phonemization failed or too many tokens");
+            continue;
+        }
+        audio_size = 0;
+        // Xtensa defines int32_t as long, not int. Copy values rather than
+        // aliasing the phonemizer's int buffer through an incompatible pointer.
+        for (int i = 0; i < count; ++i) model_ids[i] = ids[i];
+        snt_config cfg{front, model, arena, arena_bytes, nullptr};
+        snt_stats stats{};
+        int rc = snt_synthesize(&cfg, model_ids, count, collect_pcm, nullptr, &stats);
+        if (rc != 0)
+        {
+            ESP_LOGW(TAG, "Synthesis rejected (%d); no partial audio played", rc);
+            continue;
+        }
+        ESP_LOGI(TAG, "%d samples synthesized in %lld us", stats.samples,
+                 static_cast<long long>(stats.elapsed_us));
+        // Whole-utterance buffering avoids underruns with the scalar port.
+        // The sink blocks until the mixer releases this buffer.
+        if (audio_size && output(audio, audio_size, output_user) != 0)
+            ESP_LOGW(TAG, "Playback failed");
+    }
+}
+}
+
+esp_err_t flatsphere_sanotts_init(flatsphere_pcm_sink sink, void *user)
+{
+    if (!sink) return ESP_ERR_INVALID_ARG;
+    if (queue) return ESP_ERR_INVALID_STATE;
+    arena = heap_caps_aligned_alloc(16, arena_bytes, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    audio = static_cast<int16_t *>(heap_caps_malloc(pcm_capacity * sizeof(int16_t),
+                                                  MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
+    queue = xQueueCreate(4, sizeof(Request));
+    output = sink;
+    output_user = user;
+    if (arena && audio && queue &&
+        xTaskCreatePinnedToCore(worker, "sanotts", 24576, nullptr, 4, nullptr, 1) == pdPASS)
+        return ESP_OK;
+    heap_caps_free(arena);
+    heap_caps_free(audio);
+    if (queue) vQueueDelete(queue);
+    arena = nullptr;
+    audio = nullptr;
+    queue = nullptr;
+    return ESP_ERR_NO_MEM;
+}
+
+bool flatsphere_sanotts_say(const char *text)
+{
+    if (!queue || failed.load() || !text) return false;
+    size_t length = strnlen(text, sizeof(Request::text));
+    if (!length || length >= sizeof(Request::text)) return false;
+    Request request{};
+    memcpy(request.text, text, length + 1);
+    return xQueueSend(queue, &request, 0) == pdTRUE;
+}

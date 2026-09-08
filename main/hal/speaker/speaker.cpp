@@ -48,8 +48,17 @@ namespace HAL
         {
             _task_semaphore = xSemaphoreCreateBinary();
         }
+        if (_task_semaphore == nullptr)
+        {
+            i2s_channel_disable(_tx_chan);
+            i2s_del_channel(_tx_chan);
+            _tx_chan = nullptr;
+            return ESP_ERR_NO_MEM;
+        }
 
         // Create speaker task (no semaphore needed, we use task notifications)
+        // The other core can enter spk_task before task creation returns.
+        _task_running = true;
         BaseType_t result;
         if (_cfg.task_pinned_core < 2)
         {
@@ -66,12 +75,16 @@ namespace HAL
             result = xTaskCreate(spk_task, "speaker_task", 2048, this, _cfg.task_priority, &_task_handle);
         }
 
-        if (result != pdPASS || _task_semaphore == nullptr)
+        if (result != pdPASS)
         {
-            return ESP_ERR_NOT_SUPPORTED;
+            _task_running = false;
+            _task_handle = nullptr;
+            i2s_channel_disable(_tx_chan);
+            i2s_del_channel(_tx_chan);
+            _tx_chan = nullptr;
+            return ESP_ERR_NO_MEM;
         }
 
-        _task_running = true;
         return ESP_OK;
     }
 
@@ -319,6 +332,17 @@ namespace HAL
                          false);
     }
 
+    bool Speaker::playRawBlocking(uint8_t channel, const int16_t* samples, size_t size, uint32_t sample_rate)
+    {
+        if (channel >= CHANNELS_NUM || !sample_rate || !playRaw(samples, size, sample_rate, false, 1, channel))
+            return false;
+        // The mixer clears this atomic bit only after releasing both descriptors.
+        // Waiting for descriptor room alone does NOT release caller-owned PCM.
+        while (_play_channel_bits.load() & (1u << channel))
+            vTaskDelay(1);
+        return true;
+    }
+
     bool Speaker::playWav(const uint8_t* wav_data, size_t data_len, uint32_t repeat, int channel, bool stop_current_sound)
     {
         // Parse WAV header
@@ -418,7 +442,8 @@ namespace HAL
         {
             for (size_t ch = 0; ch < CHANNELS_NUM; ++ch)
             {
-                if (_ch_info[ch].wavinfo[0].repeat == 0)
+                if (!((_reserved_channel_bits.load() | _play_channel_bits.load()) & (1u << ch)) &&
+                    _ch_info[ch].wavinfo[0].repeat == 0 && _ch_info[ch].wavinfo[1].repeat == 0)
                 {
                     channel = ch;
                     break;
@@ -759,7 +784,7 @@ namespace HAL
                 do
                 {
                     size_t bytes_written = 0;
-                    if (i2s_channel_write(self->_tx_chan, self->mix_buf + bytes_total, bytes_to_send - bytes_total, &bytes_written, portMAX_DELAY) == ESP_OK)
+                    if (i2s_channel_write(self->_tx_chan, reinterpret_cast<uint8_t*>(self->mix_buf) + bytes_total, bytes_to_send - bytes_total, &bytes_written, portMAX_DELAY) == ESP_OK)
                     {
                         bytes_total += bytes_written;
                     }
@@ -779,6 +804,8 @@ namespace HAL
         }
 
         delete[] self->mix_buf;
+        self->mix_buf = nullptr;
+        self->_task_handle = nullptr;
         vTaskDelete(nullptr);
     }
 

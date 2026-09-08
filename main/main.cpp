@@ -8,7 +8,12 @@
 #include <cstdint>
 #include "hal/hal_185c.h"
 #include "settings/settings.hpp"
+#include "sdkconfig.h"
+#if CONFIG_FLATSPHERE_TTS_SANO
+#include "flatsphere_sanotts.h"
+#else
 #include "picotts.h"
+#endif
 #include <lvgl.h>
 #include "ui/ui.h"
 #include "esp_random.h"
@@ -20,6 +25,18 @@
 #include <format>
 
 static const char* TAG = "MAIN";
+static bool speech_available = false;
+
+static void speak(const char* text)
+{
+    if (!speech_available) return;
+#if CONFIG_FLATSPHERE_TTS_SANO
+    if (!flatsphere_sanotts_say(text))
+        ESP_LOGW(TAG, "Speech unavailable, too long, or queue full; announcement skipped");
+#else
+    picotts_add(text, strlen(text) + 1);
+#endif
+}
 
 #define BATTERY_UPDATE_INTERVAL (5 * 1000)
 #define TIME_ADJUSTMENT_INTERVAL (60 * 1000)
@@ -102,7 +119,7 @@ static void read_battery_level(void)
         last_level = level;
         std::string level_str = std::format("battery level is {}%", level);
         ESP_LOGI(TAG, "Saying battery level: %s", level_str.c_str());
-        picotts_add(level_str.c_str(), level_str.length() + 1);
+        speak(level_str.c_str());
     }
 }
 
@@ -297,11 +314,18 @@ extern "C" void ui_open_settings(void)
     _ui_screen_change(&ui_SetDate, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 250, 0, &ui_SetDate_screen_init);
 }
 
+#if CONFIG_FLATSPHERE_TTS_SANO
+static int on_sano_samples(const int16_t* samples, size_t size, void*)
+{
+    return hal.speaker()->playRawBlocking(1, samples, size, 22050) ? 0 : 1;
+}
+#else
 static void on_samples(int16_t* samples, size_t size)
 {
-    // play to virtual channel 1
-    hal.speaker()->playRaw((const int16_t*)samples, size, PICOTTS_SAMPLE_FREQ_HZ, false, 1, 1);
+    // Pico reuses its callback buffer: wait until the mixer releases it.
+    hal.speaker()->playRawBlocking(1, samples, size, PICOTTS_SAMPLE_FREQ_HZ);
 }
+#endif
 
 static void say_time(struct tm* timeinfo)
 {
@@ -357,7 +381,7 @@ static void say_time(struct tm* timeinfo)
     }
 
     ESP_LOGI(TAG, "Saying time: %s", time_str.c_str());
-    picotts_add(time_str.c_str(), time_str.length() + 1);
+    speak(time_str.c_str());
 }
 
 esp_err_t setup()
@@ -377,20 +401,22 @@ esp_err_t setup()
     ESP_RETURN_ON_ERROR(hal.mic()->begin(), TAG, "Failed to start mic");
 #endif
     ESP_RETURN_ON_ERROR(hal.speaker()->begin(), TAG, "Failed to start speaker");
+    hal.speaker()->reserveChannel(1);
     hal.speaker()->setVolume(settings.getNumber("system", "volume"));
-    // setup TTS
-    // ! important: task prio must be high enough
-    unsigned prio = 6;
-    if (!picotts_init(prio, on_samples, TTS_CPU_CORE))
+    // A speech failure must not prevent the clock UI from starting.
+#if CONFIG_FLATSPHERE_TTS_SANO
+    speech_available = flatsphere_sanotts_init(on_sano_samples, nullptr) == ESP_OK;
+#else
+    speech_available = picotts_init(6, on_samples, TTS_CPU_CORE);
+#endif
+    if (!speech_available)
     {
-        ESP_LOGE(TAG, "Failed to initialize TTS");
-        return ESP_FAIL;
+        ESP_LOGE(TAG, "Speech unavailable; continuing with clock UI");
     }
     if (settings.getBool("system", "boot_sound"))
     {
         int greeting_index = esp_random() % GREETING_NUM;
-        // we have to add tailing 0 to PicoTTS
-        picotts_add(greetings[greeting_index], strlen(greetings[greeting_index]) + 1);
+        speak(greetings[greeting_index]);
         // or play wav
         // hal.speaker()->playWav(coin16_wav_start, coin16_wav_end - coin16_wav_start);
     }
@@ -419,7 +445,7 @@ esp_err_t setup()
 
 extern "C" void app_main(void)
 {
-    setup();
+    ESP_ERROR_CHECK(setup());
     std::string last_week_day = "";
     ui_reset_last_touch();
     while (1)

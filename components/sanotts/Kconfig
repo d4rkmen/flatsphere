@@ -1,0 +1,20 @@
+menu "FlatSphere speech"
+
+choice FLATSPHERE_TTS_BACKEND
+    prompt "Speech backend"
+    default FLATSPHERE_TTS_SANO if IDF_TARGET_ESP32S3 && SPIRAM
+    default FLATSPHERE_TTS_PICO
+
+config FLATSPHERE_TTS_PICO
+    bool "PicoTTS (existing backend)"
+
+config FLATSPHERE_TTS_SANO
+    bool "sanoTTS + espeak-ng (experimental, GPLv3)"
+    depends on IDF_TARGET_ESP32S3 && SPIRAM
+    help
+        Downloads pinned upstream sources at configure time. Requires the
+        espeak SPIFFS partition to be flashed. Currently English Kristin only.
+        This includes GPLv3 espeak-ng; review distribution obligations.
+endchoice
+
+endmenu
