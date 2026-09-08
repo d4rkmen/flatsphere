@@ -17,6 +17,10 @@ namespace {
 constexpr size_t arena_bytes = 2 * 1024 * 1024;
 constexpr size_t pcm_capacity = 640 * 256; // capped by patched runtime
 constexpr unsigned sample_rate = 22050;
+// ESP-IDF task stack sizes are bytes. eSpeak MakePhonemeList alone needs
+// 32,000 bytes for ph_list3[1000], plus TranslateClause and worker frames.
+// The old 24 KiB stack let phonemization overwrite adjacent free heap.
+constexpr uint32_t worker_stack_bytes = 64 * 1024;
 struct Request { char text[192]; };
 QueueHandle_t queue;
 std::atomic<bool> failed{false};
@@ -56,13 +60,18 @@ void worker(void *)
         vTaskDelete(nullptr);
         return;
     }
-    ESP_LOGI(TAG, "English Kristin ready (scalar, PSRAM); PCM %u Hz", sample_rate);
+    ESP_LOGI(TAG, "sanoTTS ready (scalar, PSRAM); PCM %u Hz; stack %lu bytes",
+             sample_rate, static_cast<unsigned long>(worker_stack_bytes));
     Request request;
     int ids[256];
     int32_t model_ids[256];
     while (xQueueReceive(queue, &request, portMAX_DELAY) == pdTRUE)
     {
         int count = esp_g2p_text_to_ids(request.text, ids, 256);
+        // IDF reports this in bytes. Keep the minimum visible on-device so
+        // longer utterances and language-specific call paths can be checked.
+        ESP_LOGI(TAG, "G2P tokens %d; stack minimum free %lu bytes", count,
+                 static_cast<unsigned long>(uxTaskGetStackHighWaterMark(nullptr)));
         if (count < 3)
         {
             ESP_LOGW(TAG, "Rejected utterance: phonemization failed or too many tokens");
@@ -80,8 +89,9 @@ void worker(void *)
             ESP_LOGW(TAG, "Synthesis rejected (%d); no partial audio played", rc);
             continue;
         }
-        ESP_LOGI(TAG, "%d samples synthesized in %lld us", stats.samples,
-                 static_cast<long long>(stats.elapsed_us));
+        ESP_LOGI(TAG, "%d samples synthesized in %lld us; stack minimum free %lu bytes", stats.samples,
+             static_cast<long long>(stats.elapsed_us),
+             static_cast<unsigned long>(uxTaskGetStackHighWaterMark(nullptr)));
         // Whole-utterance buffering avoids underruns with the scalar port.
         // The sink blocks until the mixer releases this buffer.
         if (audio_size && output(audio, audio_size, output_user) != 0)
@@ -101,7 +111,7 @@ esp_err_t flatsphere_sanotts_init(flatsphere_pcm_sink sink, void *user)
     output = sink;
     output_user = user;
     if (arena && audio && queue &&
-        xTaskCreatePinnedToCore(worker, "sanotts", 24576, nullptr, 4, nullptr, 1) == pdPASS)
+        xTaskCreatePinnedToCore(worker, "sanotts", worker_stack_bytes, nullptr, 4, nullptr, 1) == pdPASS)
         return ESP_OK;
     heap_caps_free(arena);
     heap_caps_free(audio);
