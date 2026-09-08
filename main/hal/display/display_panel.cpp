@@ -27,9 +27,8 @@ esp_err_t Display::tx_param(int lcd_cmd, const void* param, size_t param_size)
     lcd_cmd &= 0xff;
     lcd_cmd <<= 8;
     lcd_cmd |= LCD_OPCODE_WRITE_CMD << 24;
-    uint32_t value = 0;
-    memcpy(&value, param, param_size);
-    // ESP_LOGD(TAG, "tx_param: 0x%08X, param: 0x%08X", lcd_cmd, value);
+    // Forward parameters directly: gamma commands contain 14 bytes, so they
+    // must not be copied into a uint32_t debug temporary.
     return esp_lcd_panel_io_tx_param(_io_handle_write, lcd_cmd, param, param_size);
 }
 
@@ -41,9 +40,6 @@ esp_err_t Display::rx_param(int lcd_cmd, void* param, size_t param_size)
     lcd_cmd |= LCD_OPCODE_READ_CMD << 24;
     ESP_RETURN_ON_ERROR(esp_lcd_panel_io_rx_param(_io_handle_read, lcd_cmd, param, param_size), TAG, "rx_param failed");
 
-    uint32_t value = 0;
-    memcpy(&value, param, param_size > sizeof(value) ? sizeof(value) : param_size);
-    // ESP_LOGD(TAG, "rx_param: 0x%08X, param: 0x%08X", lcd_cmd, value);
     return ESP_OK;
 }
 
@@ -53,7 +49,13 @@ esp_err_t Display::tx_color(int lcd_cmd, const void* param, size_t param_size)
     lcd_cmd <<= 8;
     lcd_cmd |= LCD_OPCODE_WRITE_COLOR << 24;
     // ESP_LOGD(TAG, "tx_color: 0x%08X", lcd_cmd);
-    return esp_lcd_panel_io_tx_color(_io_handle_write, lcd_cmd, param, param_size);
+    esp_err_t ret = esp_lcd_panel_io_tx_color(_io_handle_write, lcd_cmd, param, param_size);
+    // Color writes are queued. Drain even after a partial queueing failure,
+    // before fill_rect frees its buffer or LVGL reuses a draw buffer.
+    // A negative command with no parameters waits without sending a command.
+    // Do not pass -1 through tx_param(), which encodes panel opcodes.
+    ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(_io_handle_write, -1, nullptr, 0));
+    return ret;
 }
 
 // ============================================================================
