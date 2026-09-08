@@ -348,6 +348,9 @@ esp_err_t Display::init_lvgl()
         return ESP_ERR_NO_MEM;
     }
 
+    // Set the format before LVGL calculates the buffer stride and capacity.
+    lv_display_set_color_format(_lv_disp, LV_COLOR_FORMAT_RGB565);
+
     // Set display buffers
     lv_display_set_buffers(_lv_disp, _lv_buf1, _lv_buf2, DisplayConfig::LVGL::BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
@@ -356,8 +359,6 @@ esp_err_t Display::init_lvgl()
 
     // Set user data
     lv_display_set_user_data(_lv_disp, this);
-    // ! BUG: use LV_COLOR_FORMAT_RGB565_SWAPPED lvgl greater 9.4
-    lv_display_set_color_format(_lv_disp, LV_COLOR_FORMAT_RGB565);
     lv_display_add_event_cb(_lv_disp, lvgl_resolution_changed_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
     // Create input device
@@ -403,12 +404,23 @@ void Display::lvgl_flush_cb(lv_display_t* disp, const lv_area_t* area, uint8_t* 
     // ! BUG: use LV_COLOR_FORMAT_RGB565_SWAPPED lvgl greater 9.4
     lv_draw_sw_rgb565_swap(px_map, lv_area_get_size(area));
 
-    display->panel_draw_bitmap(area->x1,
+    esp_err_t ret = display->panel_draw_bitmap(area->x1,
                                area->y1,
                                area->x2 + 1,
                                area->y2 + 1,
                                px_map);
 
+    if (ret != ESP_OK)
+    {
+        const uint32_t caps = MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA;
+        ESP_LOGE(TAG, "LVGL flush (%ld,%ld)-(%ld,%ld) failed: %s; DMA free=%u largest=%u",
+                 static_cast<long>(area->x1), static_cast<long>(area->y1),
+                 static_cast<long>(area->x2), static_cast<long>(area->y2),
+                 esp_err_to_name(ret),
+                 static_cast<unsigned>(heap_caps_get_free_size(caps)),
+                 static_cast<unsigned>(heap_caps_get_largest_free_block(caps)));
+    }
+    // panel_draw_bitmap has drained DMA before releasing the buffer.
     lv_display_flush_ready(disp);
 }
 

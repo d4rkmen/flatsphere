@@ -53,7 +53,10 @@ namespace DisplayConfig
         constexpr int SPI_MODE = 0;
         constexpr uint32_t SPI_CLK_WRITE_HZ = 80 * 1000 * 1000; // 80MHz for write
         constexpr uint32_t SPI_CLK_READ_HZ = 3 * 1000 * 1000;   // 3MHz for read
-        constexpr int SPI_TRANS_QUEUE_SZ = 10;
+        // PSRAM pixels are copied into internal DMA buffers by esp_lcd.
+        // Recycle each chunk before queueing the next: ten queued chunks
+        // compete with the 64 KiB speech stack for scarce internal RAM.
+        constexpr int SPI_TRANS_QUEUE_SZ = 1;
         constexpr int SPI_CMD_BITS = 32;
         constexpr int SPI_PARAM_BITS = 8;
         constexpr int SPI_MAX_TRANSFER_SIZE = 2048;
