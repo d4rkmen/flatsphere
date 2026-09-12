@@ -43,6 +43,18 @@ static void speak(const char* text)
 #define DIM_TIMEOUT (30 * 1000)
 static const char* week_day_names[] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
 #define GREETING_NUM 8
+#if CONFIG_FLATSPHERE_TTS_VOICE_UK
+const char* greetings[GREETING_NUM] = {
+    "Привіт! Гарний час почати свій день",
+    "Вітаємо у годиннику флет сфера",
+    "Час на вашому боці",
+    "Не квап коней",
+    "Ця мить безцінна",
+    "Час — єдине, що справді цінне",
+    "Не дайте часу вислизнути",
+    "Гарно проведіть час",
+};
+#else
 const char* greetings[GREETING_NUM] = {
     "Hi! It is a good time to start your day",
     "Welcome to flat sphere clock",
@@ -53,6 +65,14 @@ const char* greetings[GREETING_NUM] = {
     "Don't let time slip away",
     "Have a great time",
 };
+#endif
+
+#if CONFIG_FLATSPHERE_TTS_VOICE_UK
+static const char* ua_number_fem(int n);
+static const char* ua_minutes_form(int n);
+static const char* ua_hours_form(int n);
+static const char* ua_percent(int n);
+#endif
 
 // same core as Speaker task
 #define TTS_CPU_CORE 1
@@ -117,7 +137,11 @@ static void read_battery_level(void)
     if (abs(level - last_level) > 1)
     {
         last_level = level;
+#if CONFIG_FLATSPHERE_TTS_VOICE_UK
+        std::string level_str = std::format("рівень заряду батареї {} {}", level, ua_percent(level));
+#else
         std::string level_str = std::format("battery level is {}%", level);
+#endif
         ESP_LOGI(TAG, "Saying battery level: %s", level_str.c_str());
         speak(level_str.c_str());
     }
@@ -327,6 +351,52 @@ static void on_samples(int16_t* samples, size_t size)
 }
 #endif
 
+#if CONFIG_FLATSPHERE_TTS_VOICE_UK
+// Ukrainian numeral agreement helpers (feminine nominative for the clock).
+static const char* ua_number_fem(int n)
+{
+    static const char* ones[] = {"", "одна", "дві", "три", "чотири", "п'ять", "шість", "сім", "вісім", "дев'ять"};
+    static const char* teens[] = {"десять", "одинадцять", "дванадцять", "тринадцять", "чотирнадцять",
+                                  "п'ятнадцять", "шістнадцять", "сімнадцять", "вісімнадцять", "дев'ятнадцять"};
+    static const char* tens[] = {"", "", "двадцять", "тридцять", "сорок", "п'ятдесят"};
+    static char buf[2][32];
+    static int flip = 0;
+    char* out = buf[flip ^= 1];
+    if (n < 10) snprintf(out, 32, "%s", ones[n]);
+    else if (n < 20) snprintf(out, 32, "%s", teens[n - 10]);
+    else if (n % 10 == 0) snprintf(out, 32, "%s", tens[n / 10]);
+    else snprintf(out, 32, "%s %s", tens[n / 10], ones[n % 10]);
+    return out;
+}
+static const char* ua_minutes_form(int n)
+{
+    int m = n % 100;
+    if (m >= 11 && m <= 14) return "хвилин";
+    int r = n % 10;
+    if (r == 1) return "хвилина";
+    if (r >= 2 && r <= 4) return "хвилини";
+    return "хвилин";
+}
+static const char* ua_hours_form(int n)
+{
+    int m = n % 100;
+    if (m >= 11 && m <= 14) return "годин";
+    int r = n % 10;
+    if (r == 1) return "година";
+    if (r >= 2 && r <= 4) return "години";
+    return "годин";
+}
+static const char* ua_percent(int n)
+{
+    int m = n % 100;
+    if (m >= 11 && m <= 14) return "відсотків";
+    int r = n % 10;
+    if (r == 1) return "відсоток";
+    if (r >= 2 && r <= 4) return "відсотки";
+    return "відсотків";
+}
+#endif
+
 static void say_time(struct tm* timeinfo)
 {
     int hour = timeinfo->tm_hour;
@@ -335,6 +405,23 @@ static void say_time(struct tm* timeinfo)
 
     std::string time_str;
 
+#if CONFIG_FLATSPHERE_TTS_VOICE_UK
+    if (hour == 0 && minute == 0)
+    {
+        time_str = "зараз північ";
+    }
+    else if (hour == 12 && minute == 0)
+    {
+        time_str = "зараз полудень";
+    }
+    else
+    {
+        int h = hour_12 == 0 ? 12 : hour_12;
+        time_str = std::format("зараз {} {}", ua_number_fem(h), ua_hours_form(h));
+        if (minute > 0)
+            time_str += std::format(" {} {}", ua_number_fem(minute), ua_minutes_form(minute));
+    }
+#else
     if (hour == 0 && minute == 0)
     {
         time_str = "It is midnight";
@@ -379,6 +466,7 @@ static void say_time(struct tm* timeinfo)
             time_str = std::format("It is {}  {}", hour, minute);
         }
     }
+#endif
 
     ESP_LOGI(TAG, "Saying time: %s", time_str.c_str());
     speak(time_str.c_str());
