@@ -17,4 +17,8 @@ idf_component_register(SRCS "main.cpp" ${HAL_SRCS} ${SETTINGS_SRCS} ${UI_SRCS}
 )
                     
 
-nvs_create_partition_image(nvs ../nvs.csv FLASH_IN_PROJECT)
+if(CONFIG_FLATSPHERE_FLASH_FACTORY_NVS)
+    nvs_create_partition_image(nvs ../nvs.csv FLASH_IN_PROJECT)
+else()
+    nvs_create_partition_image(nvs ../nvs.csv)
+endif()

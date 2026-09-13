@@ -1,4 +1,5 @@
 #include "flatsphere_sanotts.h"
+#include "sdkconfig.h"
 #include "snt_tts.h"
 extern "C" {
 #include "esp_g2p.h"
@@ -62,6 +63,12 @@ void worker(void *)
     }
     ESP_LOGI(TAG, "sanoTTS ready (scalar, PSRAM); PCM %u Hz; stack %lu bytes",
              sample_rate, static_cast<unsigned long>(worker_stack_bytes));
+#if CONFIG_FLATSPHERE_TTS_UK_MYKYTA
+    ESP_LOGI(TAG, "Voice: Ukrainian Mykyta");
+#if CONFIG_FLATSPHERE_TTS_MYKYTA_DEVICE_TEST
+    ESP_LOGW(TAG, "EXPERIMENTAL DEVICE TEST: Mykyta export has not passed parity acceptance");
+#endif
+#endif
     Request request;
     int ids[256];
     int32_t model_ids[256];

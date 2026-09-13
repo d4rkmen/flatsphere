@@ -1,0 +1,24 @@
+{"id":"greeting","text":"Вітаємо! Раді вас чути.","category":"greeting"}
+{"id":"morning","text":"Доброго ранку! Нехай день буде вдалим.","category":"greeting"}
+{"id":"midnight","text":"Зараз північ.","category":"time"}
+{"id":"noon","text":"Зараз полудень.","category":"time"}
+{"id":"one","text":"Зараз перша година.","category":"time"}
+{"id":"two","text":"Зараз друга година п'ять хвилин.","category":"time"}
+{"id":"quarter","text":"Зараз третя година п'ятнадцять хвилин.","category":"time"}
+{"id":"half","text":"Зараз четверта година тридцять хвилин.","category":"time"}
+{"id":"late","text":"Зараз двадцять третя година сорок п'ять хвилин.","category":"time"}
+{"id":"minute_one","text":"Залишилася одна хвилина.","category":"grammar"}
+{"id":"minute_two","text":"Залишилося дві хвилини.","category":"grammar"}
+{"id":"minute_five","text":"Залишилося п'ять хвилин.","category":"grammar"}
+{"id":"battery_one","text":"Заряд батареї — один відсоток.","category":"battery"}
+{"id":"battery_two","text":"Заряд батареї — двадцять два відсотки.","category":"battery"}
+{"id":"battery_five","text":"Заряд батареї — сімдесят п'ять відсотків.","category":"battery"}
+{"id":"battery_full","text":"Батарея повністю заряджена.","category":"battery"}
+{"id":"charging","text":"Підключено зарядний пристрій.","category":"system"}
+{"id":"date","text":"Сьогодні понеділок, сьоме вересня.","category":"date"}
+{"id":"ukrainian_letters","text":"Ґанок, їжак, єдність, щастя, Україна.","category":"phonemes"}
+{"id":"apostrophe","text":"П'ять, м'ята, об'єкт, зв'язок, сім'я.","category":"phonemes"}
+{"id":"soft_sign","text":"День, ніч, тінь, льон, сьогодні.","category":"phonemes"}
+{"id":"stress","text":"Новий годинник показує точний час.","category":"stress"}
+{"id":"raw_digits","text":"Зараз 12:45. Заряд батареї 21%.","category":"normalization"}
+{"id":"question","text":"Котра зараз година?", "category":"intonation"}

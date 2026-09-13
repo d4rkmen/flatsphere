@@ -1,0 +1,33 @@
+{
+  "date": "2026-09-07",
+  "voice": "tetiana",
+  "run": "work/tetiana/synthesize-v1",
+  "phrases": 24,
+  "components": {
+    "duration": "work/tetiana/duration-100000-mps-v1/duration-student.pt",
+    "acoustic": "work/tetiana/acoustic40-1000-cpu-v1/latent-student.pt",
+    "decoder": "work/tetiana/lrc-r7-3000-cpu-spectral5-v1/decoder-student.pt"
+  },
+  "duration_result": {
+    "heldout_token_mae": 0.8011438627364716,
+    "heldout_token_exact": 0.5411350637923449,
+    "heldout_frame_ratio_mean": 0.9460791897143265,
+    "train_frame_ratio_mean": 0.9567173528313697,
+    "note": "100k steps on full 2644-row corpus; no significant overfitting"
+  },
+  "full_stack_duration": {
+    "mean_student_seconds": 2.465668934240363,
+    "mean_teacher_seconds": 2.3935903250188963,
+    "note": "learned durations track the teacher closely"
+  },
+  "full_stack_amplitude": {
+    "min_student_rms": 0.008047527633607388,
+    "max_student_rms": 0.0187140554189682,
+    "teacher_rms_range": [0.13, 0.20],
+    "note": "student output is roughly 10x too quiet; decoder is the amplitude bottleneck"
+  },
+  "quality_accepted": false,
+  "arbitrary_text_ready": false,
+  "mcu_export_ready": false,
+  "next": "Longer decoder training and acoustic training; investigate decoder gain/amplitude reconstruction before export"
+}

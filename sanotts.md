@@ -1,13 +1,114 @@
 # sanoTTS integration milestones
 
-Branch: `feature/sanotts` · Updated: 2026-09-07
+Branch: `feature/sanotts` · Updated: 2026-09-08
+
+## Ukrainian voice — export + firmware (2026-09-08)
+
+- **int8 exporter implemented** (`lang/ua/export_int8.py`). The pinned upstream
+  ships the C runtime and generated meta headers but not the exporter scripts
+  (`export_front_q8.py` / `export_fsd_q8.py` / `export_fsd_golden.py`), so the
+  byte format was reconstructed from the runtime's dequantization contract
+  (`out[o] = s_act * sc[o] * dot(q_act, w8[o]) + bias[o]`; per-output-channel
+  int8 weights `sc = max|W|/127`; conv weights laid out `[out, pad16(in*K)]`
+  channel-major/kernel-minor; embeddings and decoder depthwise/norm stay fp32).
+- **C golden gate** (`lang/ua/golden_test.sh`): the exported blobs reproduce the
+  float PyTorch model. Decoder alone is **corr 0.9984 / rms 0.981** (Python code
+  injected through the runtime's `SNT_INJECT_FRONT_PATH`). Full stack
+  **corr 0.942 / rms 0.953**, below the 0.98 production gate — the residual is
+  int8 quantization of the under-trained 150k-step acoustic model (its predicted
+  40-code is corr 0.9998 vs float but the FSD FiLM conditioning amplifies the
+  ~2% code error). Expected to improve as training converges; not a format bug.
+- **Shared phoneme inventory confirmed**: the Piper `phoneme_id_map` is identical
+  across English and Ukrainian (same 256-symbol IPA inventory, same IDs), so the
+  on-device `CP_ID` table is reusable. espeak-ng "uk" IPA output (β, ɛ, ɪ, ɲ, ː,
+  ˈ, ̪) is fully covered by the existing table.
+- **Firmware integration**: `components/sanotts/voices/uk/` (int8 blobs + meta
+  headers), `components/sanotts/espeak-uk/` (uk_dict + lang/zle/uk), Kconfig
+  voice choice `FLATSPHERE_TTS_VOICE` (uk default), conditional espeak voice
+  patch, and Ukrainian greetings/time/battery phrases with numeral agreement in
+  `main.cpp`. Firmware builds: **0x276a80 bytes (2.58 MiB), 38% app free**.
+- **Not yet flashed**; quality not accepted (model still under-trained).
+
+## Follow-up: device feedback and Ukrainian voices
+
+- **2026-09-07, user-reported:** sanoTTS works on the clock and sounds much
+  better than PicoTTS. This confirms basic playback by user observation;
+  measured latency, heap/stack headroom and long-run stress checks remain open.
+- Ukrainian male/female preparation now lives in **`lang/ua`**. Public
+  Mykyta/Tetiana recordings and matching Apache-2.0 Piper teachers were downloaded
+  and checksum-verified. Both have deterministic corpus splits, 24 teacher
+  listening samples, validated small teacher packs and successful 20-step
+  MPS duration-training smoke runs. See `lang/ua/README.md` for counts and results.
+- **Not complete:** Ukrainian sanoTTS acoustic/decoder training, int8 export and
+  firmware integration. The pinned upstream repository lacks required R7
+  acoustic/QAT/export tools. No Ukrainian voices were flashed; the working
+  English firmware was not changed during this preparation.
+- **Route A experiment completed:** Tetiana teacher decoder-cut parity passed
+  (minimum cosine 0.9999998628); a 100-step R7-shaped LRC/FSD CPU run produced
+  checkpoints and four held-out oracle WAVs. Added a hash-checked compatibility
+  launcher and validated 40-channel target builder in `lang/ua/lrc_experiment.py`.
+  Student oracle quality is **not accepted** (mean cosine 0.00980, low output
+  RMS); these are execution tests, not flashable voices. Details and artifacts
+  are in `lang/ua/README.md`.
 
 ## Status
 
+### Tetiana larger training update (2026-09-07)
+
+- **Long decoder training COMPLETED (200k steps):** `lang/ua/decoder-long.json`
+  ran 20×10k weight-continuation segments on the full `duration-packs-full-v1`.
+  Held-out chunk metrics jumped to **RMS ratio 0.936, cosine 0.852** (oracle
+  render cosine 0.838), resolving the earlier amplitude problem. Final checkpoint
+  in `lang/ua/work/tetiana/decoder-200000-cpu-v1/seg-00019/`. Summary:
+  `lang/ua/experiments/tetiana-decoder-200k.json`.
+- **Acoustic code targets regenerated** from the final decoder (2,969 train +
+  167 eval) and **acoustic training STARTED**: 150k steps on MPS with periodic
+  checkpoints via upstream `--checkpoint-steps` into
+  `lang/ua/work/tetiana/acoustic-150000-mps-v1/`. Full-stack re-synthesis follows.
+- **Full-stack audio is a real voice:** the `synthesize-v1` results were
+  user-confirmed as good-sounding (not noise); the low RMS is a loudness-scaling
+  artifact that the completed decoder training largely resolved.
+- **Size budget confirmed:** the R7 architecture sizes to ~680 KB int8
+  (duration ~40 KB + acoustic ~200 KB + decoder ~400 KB), matching the English
+  Kristin voice and fitting the 2.6–3 MB budget with no size reduction.
+  17 regression tests pass; the acoustic job is the only active training run.
+
+- **Long duration run completed:** 100k MPS steps on 2,644/145 rows
+  (2,969/167 chunks). Held-out token MAE **0.801**, token exact **54.1%**,
+  frame ratio **0.946** (train 0.957, so no significant overfitting).
+  Checkpoints saved every 1k steps; final model in
+  `lang/ua/work/tetiana/duration-100000-mps-v1/`.
+- **Full-stack synthesis works end-to-end:** `lang/ua/synthesize.py` maps text
+  through learned duration → acoustic → decoder and produced 24 clock-phrase
+  WAVs in `lang/ua/work/tetiana/synthesize-v1/`. Learned durations closely track
+  the teacher (mean 2.466s vs 2.393s), but student amplitude is ~10× too low
+  (RMS ~0.013–0.019 vs teacher ~0.13–0.20). The decoder is the amplitude
+  bottleneck. Summary: `lang/ua/experiments/tetiana-fullstack-v1.json`.
+
+- **Acoustic training now executes:** repaired only the non-QAT import path in
+  a hash-checked in-memory launcher (`lang/ua/acoustic_experiment.py`). Generated
+  282/37 aligned code targets and trained a 204,288-parameter acoustic40 model
+  for 1,000 CPU steps, with full 256-entry vocabulary. Held-out code cosine
+  **0.78099**, L1 **0.14251**. Four paired oracle/predicted-code WAVs rendered
+  with teacher durations. This remains an experiment on an unapproved decoder,
+  **not** learned-duration TTS or a flashable voice. Summary:
+  `lang/ua/experiments/tetiana-acoustic-v1.json`; 12 regression tests pass.
+
+- Prepared validated **256 training / 32 held-out** teacher rows (282/37 chunks).
+- Completed two 3,000-step R7 LRC/FSD CPU experiments. Increasing spectral loss
+  weight 0.5 → 5 improved held-out RMS ratio **0.280 → 0.504**, but waveform
+  L1/cosine did not improve. Neither candidate has listening/quality approval.
+- Preserved all smoke artifacts and added named pack/run controls and full
+  held-out evaluation. Tracked results: `lang/ua/experiments/tetiana-decoder-v1.json`.
+- Tetiana is **not flashable yet**; complete acoustic training, calibrated int8
+  export and C validation remain. Per the user's sequencing, multilingual
+  FlatSphere text production will be implemented after the voice is flashable,
+  followed by on-device testing. Working English firmware remains unchanged.
+
 Experimental **English text-to-speech integration implemented and build-tested**.
 Both sanoTTS and the PicoTTS fallback compile for ESP32-S3 with ESP-IDF 5.5.4.
-No device has been flashed, and playback, latency, stack/heap headroom, and
-long-running stability on the clock are **not yet verified**. Additional spoken
+No device was flashed by the assistant. Basic playback is now user-confirmed;
+latency, stack/heap headroom, and long-running stability are **not yet measured**. Additional spoken
 languages are a follow-up, not a completed feature.
 
 ## Completed milestones

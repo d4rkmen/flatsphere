@@ -1,0 +1,11 @@
+{
+  "row_id": "00001_line000001",
+  "text": "— Було коло дев'ятої.",
+  "n_tokens": 53,
+  "frames": 180,
+  "samples": 46080,
+  "durations": "teacher/oracle",
+  "eval_pack": "/Users/dmytrom/Documents/flatsphere/lang/ua/work/mykyta/mykyta-400k-v1-packs/pack-eval",
+  "tensor_path": "/Users/dmytrom/Documents/flatsphere/lang/ua/work/mykyta/mykyta-400k-v1-packs/pack-eval/tensors/00001_line000001_chunk00.npz",
+  "tensor_sha256": "31ccc17acdf9e11d849c571073c305571b83e6e91320ab11671eebd44dc4b427"
+}

@@ -1,0 +1,15 @@
+/* Float fields in both voices require aligned flash-mapped blob bases. */
+.section .rodata.sanotts_models,"a",@progbits
+.balign 16
+.global _binary_front_q8_bin_start
+.global _binary_front_q8_bin_end
+_binary_front_q8_bin_start:
+.incbin "@VOICE_DIR@/front_q8.bin"
+_binary_front_q8_bin_end:
+
+.balign 16
+.global _binary_model_q8_bin_start
+.global _binary_model_q8_bin_end
+_binary_model_q8_bin_start:
+.incbin "@VOICE_DIR@/model_q8.bin"
+_binary_model_q8_bin_end:

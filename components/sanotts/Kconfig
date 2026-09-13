@@ -13,8 +13,59 @@ config FLATSPHERE_TTS_SANO
     depends on IDF_TARGET_ESP32S3 && SPIRAM
     help
         Downloads pinned upstream sources at configure time. Requires the
-        espeak SPIFFS partition to be flashed. Currently English Kristin only.
-        This includes GPLv3 espeak-ng; review distribution obligations.
+        espeak SPIFFS partition to be flashed. Includes GPLv3 espeak-ng;
+        review distribution obligations.
 endchoice
+
+choice FLATSPHERE_TTS_VOICE
+    prompt "sanoTTS voice"
+    default FLATSPHERE_TTS_VOICE_UK
+    depends on FLATSPHERE_TTS_SANO
+
+config FLATSPHERE_TTS_VOICE_EN
+    bool "English (Kristin)"
+
+config FLATSPHERE_TTS_VOICE_UK
+    bool "Ukrainian (experimental)"
+    help
+        Embedded Ukrainian int8 model (lang/ua/export_int8.py) plus the
+        Ukrainian espeak dictionary. The voice is a training experiment,
+        not a quality-accepted release.
+endchoice
+
+choice FLATSPHERE_TTS_UK_SPEAKER
+    prompt "Ukrainian speaker"
+    depends on FLATSPHERE_TTS_VOICE_UK
+    default FLATSPHERE_TTS_UK_TETIANA
+
+config FLATSPHERE_TTS_UK_TETIANA
+    bool "Tetiana (female)"
+
+config FLATSPHERE_TTS_UK_MYKYTA
+    bool "Mykyta (male, requires trained bundle)"
+    help
+        First train, validate, accept and install the Mykyta bundle using
+        lang/ua/mykyta_train.py. Tetiana's installed artifacts are preserved.
+endchoice
+
+config FLATSPHERE_TTS_MYKYTA_DEVICE_TEST
+    bool "Allow unaccepted Mykyta export for device testing"
+    depends on FLATSPHERE_TTS_UK_MYKYTA
+    default n
+    help
+        Explicit experimental build only. Does not mark the export as accepted
+        or bypass the training pipeline's golden/acceptance gates.
+
+config FLATSPHERE_TTS_MYKYTA_TEST_EXPORT
+    string "Experimental Mykyta export directory (project-relative or absolute)"
+    depends on FLATSPHERE_TTS_MYKYTA_DEVICE_TEST
+    default "lang/ua/work/mykyta/mykyta-400k-v1/export"
+
+config FLATSPHERE_FLASH_FACTORY_NVS
+    bool "Include factory NVS settings in full flash"
+    default n
+    help
+        Destructive: overwrites saved device settings with nvs.csv.
+        Leave disabled for firmware updates and voice tests.
 
 endmenu

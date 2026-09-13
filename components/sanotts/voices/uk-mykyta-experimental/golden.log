@@ -1,0 +1,4 @@
+frames 180 samples 46080 elapsed 11462 us; emitted 46080 expected 46080; arena 2097152 bytes
+golden corr 0.865063 (46080 samples; required > 0.98)
+golden rms_ratio 0.961231 (bound 0.80-1.25, exclusive)
+FAIL

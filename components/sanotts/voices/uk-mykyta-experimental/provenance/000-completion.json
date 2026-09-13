@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "total_steps": 100000,
+  "base_steps": 0,
+  "local_steps": 100000,
+  "mode": "weight-only; optimizer and RNG reset",
+  "artifacts_sha256": {
+    "duration-student.pt": "46ef52cd1b8d10c67987cfc083f6d81ca57f938761733e7bf2b1dfed38603d27",
+    "train-report.json": "9c595ed6476a5266009e7b9c1e348953eaeba0e7b11d5693a74281efb0532b84",
+    "invocation.json": "c6595229cecc7faacdd15c9add95e2e66d0d93cc74937597b889eb92fc0b0f86",
+    "config.json": "4049df9f3ac0bfff2da26d9a809c1b60b14a328c773592c76e4b54855db673d8"
+  }
+}

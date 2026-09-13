@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "segment": 14,
+  "steps": 10000,
+  "trainer_sha256": "f30f2bfedcd5ea152fc0dde7a4698d21c7c6d9ec2903859d141938f928e0662b",
+  "config_sha256": "c9879d81f69bb971bd838c74c45d22f3e2e21faff69ed241c78c56abb23f5d77",
+  "init_decoder_sha256": "aed6a1595e542e30bed6e6d922f7dae6e2f874e6cf7fccd2926cb0ce646af715",
+  "artifacts_sha256": {
+    "decoder-student.pt": "bb154ba0a27d5cd8b334410e684a48ada22be460826d0b23f21b2b50dcd2cf79",
+    "lrc-encoder.pt": "2e8c565b2690fc149a1c7ff067422bfc6a0650cf8826b194305457e673c0a469",
+    "train-report.json": "ddb2dceaeaacee1ae5a5f2dcd7077c4eece42062a7b7034c569d99d6bf442b20",
+    "invocation.json": "2e575d8db96fb2106fde8fd9df4219aa01be9bcfe8b335dddad4142041783314"
+  }
+}
