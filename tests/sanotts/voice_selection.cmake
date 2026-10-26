@@ -1,0 +1,13 @@
+include("${COMPONENT}/cmake/voice.cmake")
+# Mirrors components/sanotts/Kconfig: bundle name + announcement language.
+foreach(entry "uk-serhiy:ON" "en-kristin:OFF")
+    string(REPLACE ":" ";" entry "${entry}")
+    list(GET entry 0 expected)
+    list(GET entry 1 CONFIG_FLATSPHERE_TTS_LANG_UK)
+    set(CONFIG_FLATSPHERE_TTS_VOICE_BUNDLE "${expected}")
+    sanotts_select_voice("${COMPONENT}")
+    if(NOT SANOTTS_VOICE STREQUAL expected)
+        message(FATAL_ERROR "Wrong voice selected: ${SANOTTS_VOICE}")
+    endif()
+    message(STATUS "PASS ${SANOTTS_VOICE}: local bundle and hashes")
+endforeach()
