@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "speaker": "serhiy",
+  "language": "uk",
+  "experimental": false,
+  "quality_accepted": false,
+  "source": "export_manifest.json",
+  "artifacts": {
+    "e2e_audio.bin": {
+      "sha256": "7206eeb321c6781cd8f6d69f8d7b7faf3e98a1655486450831af8e9350a3774a",
+      "bytes": 285696
+    },
+    "e2e_durs.bin": {
+      "sha256": "5a9aa31ab3a067d9cf0a1e73c9798277b1b34b23e6f5cbe3043c0431d3c5ada5",
+      "bytes": 436
+    },
+    "e2e_ids.bin": {
+      "sha256": "8ba4349be62613ed7e717c66441cd0eb8f20df47d5de3162677e16e0e1f9470c",
+      "bytes": 436
+    },
+    "export_manifest.json": {
+      "sha256": "3230651b69b2e912fc834202ae15e3932d1752729cbf526e4e8e3e6c2864f6f2",
+      "bytes": 10566
+    },
+    "export_report.json": {
+      "sha256": "307f8612a558c523f7ff676d565341888f6bab3ae9e245422603cab8ab1f73e4",
+      "bytes": 868
+    },
+    "front_q8.bin": {
+      "sha256": "22ad930da117c8be52693d6c95bb69d0cfa1356612e7a06f24d6b7a821c2da96",
+      "bytes": 315668
+    },
+    "golden_meta.json": {
+      "sha256": "4965893ffd299bda3ce9e21be57954ec3369ceebd709a2a7342ed6ee93068db4",
+      "bytes": 481
+    },
+    "model/act_scales.h": {
+      "sha256": "e1a4cc25ef4ee9b28911af31e6d4ff4b475421e71a002ae2f0242302ee90a77e",
+      "bytes": 82
+    },
+    "model/chain_scales.h": {
+      "sha256": "e1a4cc25ef4ee9b28911af31e6d4ff4b475421e71a002ae2f0242302ee90a77e",
+      "bytes": 82
+    },
+    "model/front_q8_meta.h": {
+      "sha256": "10b8c7123f5be1444bcf3f73e06cee99145988510672bf80107c1b45c04a30f3",
+      "bytes": 4526
+    },
+    "model/frozen_norm.h": {
+      "sha256": "e1a4cc25ef4ee9b28911af31e6d4ff4b475421e71a002ae2f0242302ee90a77e",
+      "bytes": 82
+    },
+    "model/fsd_meta.h": {
+      "sha256": "c801301950dfeac179b352878b2c5db0b43b263dcb5a0b7fa04e8c0a3519470d",
+      "bytes": 361
+    },
+    "model/fsd_q8_meta.h": {
+      "sha256": "767e9ae8d1fd3e2b93b1a6250f378b7e77f612386f1c098fcaaeb49c8946fa57",
+      "bytes": 4069
+    },
+    "model/rb_scales.h": {
+      "sha256": "e1a4cc25ef4ee9b28911af31e6d4ff4b475421e71a002ae2f0242302ee90a77e",
+      "bytes": 82
+    },
+    "model_q8.bin": {
+      "sha256": "0c2cc2ed5e41db6ca82809b5420608e03475ef5aab6561557644f8d54f44bca4",
+      "bytes": 399484
+    }
+  }
+}

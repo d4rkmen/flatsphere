@@ -1,0 +1,331 @@
+{
+  "format_version": 1,
+  "speaker": "serhiy",
+  "exporter_sha256": "f0f72289663203a021c9dda9998746d6201debd65ff114846a44c0daa5cf9717",
+  "checkpoints": {
+    "duration": {
+      "path": "train/runs/serhiy/student/upstream-ext/duration/duration-student.pt",
+      "sha256": "f6e2f89e39164fd38a79d9387d97624602404f4ebd326baa2052178826c5b289",
+      "config": {
+        "architecture": "duration_conv",
+        "vocab_size": 256,
+        "hidden": 32,
+        "depth": 3,
+        "kernel_size": 5,
+        "max_tokens": 255,
+        "max_duration": 80,
+        "target_duration_scale": 1.0,
+        "pause_preserve_scale": 0.0,
+        "pause_preserve_window": 0,
+        "pause_token_ids": [
+          4,
+          8,
+          10,
+          11,
+          12,
+          13
+        ],
+        "long_preserve_threshold": 0.0,
+        "long_preserve_scale": 0.0,
+        "duration_vocab_size_forced": 256,
+        "duration_oov_id": 0
+      }
+    },
+    "acoustic": {
+      "path": "train/runs/serhiy/student/upstream-ext/acoustic/latent-student.pt",
+      "sha256": "fd0b4b32a21e1d3b969266336816043519a8342230cdc5a29737a1333c771973",
+      "config": {
+        "architecture": "token_context",
+        "vocab_size": 256,
+        "hidden": 48,
+        "depth": 5,
+        "kernel_size": 5,
+        "out_channels": 40,
+        "token_depth": 3
+      }
+    },
+    "decoder": {
+      "path": "train/runs/serhiy/student/upstream-real-auto-dec/finetune/checkpoint_step400000.pt",
+      "sha256": "3ef303b25be6a3b0c3df616223da6ff91ee4de2a912888d31a3a69ce29a0846f",
+      "config": {
+        "in_channels": 40,
+        "source_in_channels": 192,
+        "channels": [
+          168,
+          84,
+          42,
+          21
+        ],
+        "res_layers": 1,
+        "variant": "lrc",
+        "lrc_code_dim": 40,
+        "lrc_encoder_hidden": 64,
+        "rank_ratio": 0.5,
+        "activation": "leaky_relu",
+        "stage_affine": false,
+        "factorized_pre_rank": 0,
+        "piper_res_factor_rank_ratio": 0.0,
+        "res_bank_scale_mode": "kept",
+        "stage0_branches": [
+          0,
+          1,
+          2
+        ],
+        "stage1_branches": [
+          0,
+          1,
+          2
+        ],
+        "stage2_branches": [
+          0,
+          1,
+          2
+        ],
+        "stage3_branches": [
+          0,
+          1,
+          2
+        ],
+        "fsd_dim": 76,
+        "fsd_blocks": 5,
+        "fsd_film_rank": 12,
+        "fsd_head_rank": 48,
+        "wavehax_channels": 32,
+        "wavehax_blocks": 8,
+        "wavehax_mult_channels": 2,
+        "wavehax_kernel_freq": 7,
+        "wavehax_kernel_time": 7,
+        "wavehax_f0_channel": 80,
+        "wavehax_voiced_channel": 81,
+        "wavehax_sample_rate": 24000,
+        "wavehax_prior_power": 0.1,
+        "wavehax_prior_noise": 0.01,
+        "whx_channels": 32,
+        "whx_hidden": 64,
+        "whx_blocks": 8,
+        "whx_n_fft": 512,
+        "whx_f0_channel": 80,
+        "whx_voiced_channel": 81,
+        "whx_sample_rate": 24000,
+        "hift_width": 224,
+        "hift_gen_channels": 192,
+        "hift_style_dim": 64,
+        "hift_body_blocks": 3,
+        "hift_f0_channel": 80,
+        "hift_voiced_channel": 81,
+        "hift_sample_rate": 24000,
+        "stage_projection_bottlenecks": [],
+        "teacher_init_checkpoint": null,
+        "teacher_init_method": "first",
+        "teacher_init": null,
+        "init_decoder_checkpoint": "train/runs/serhiy/student/upstream-ext/finetune/decoder-selected.pt",
+        "decoder_init": {
+          "checkpoint": "train/runs/serhiy/student/upstream-ext/finetune/decoder-selected.pt",
+          "decoder_parameters": 331308,
+          "matched_config": {
+            "in_channels": 40,
+            "channels": [
+              168,
+              84,
+              42,
+              21
+            ],
+            "res_layers": 1,
+            "variant": "lrc",
+            "rank_ratio": 0.5,
+            "activation": "leaky_relu",
+            "stage_affine": false,
+            "factorized_pre_rank": 0,
+            "piper_res_factor_rank_ratio": 0.0,
+            "res_bank_scale_mode": "kept",
+            "stage0_branches": [
+              0,
+              1,
+              2
+            ],
+            "stage1_branches": [
+              0,
+              1,
+              2
+            ],
+            "stage2_branches": [
+              0,
+              1,
+              2
+            ],
+            "stage3_branches": [
+              0,
+              1,
+              2
+            ],
+            "fsd_dim": 76,
+            "fsd_blocks": 5,
+            "fsd_film_rank": 12,
+            "fsd_head_rank": 48,
+            "wavehax_channels": 32,
+            "wavehax_blocks": 8,
+            "wavehax_mult_channels": 2,
+            "wavehax_kernel_freq": 7,
+            "wavehax_kernel_time": 7,
+            "wavehax_f0_channel": 80,
+            "wavehax_voiced_channel": 81,
+            "wavehax_sample_rate": 24000,
+            "wavehax_prior_power": 0.1,
+            "wavehax_prior_noise": 0.01,
+            "whx_channels": 32,
+            "whx_hidden": 64,
+            "whx_blocks": 8,
+            "whx_n_fft": 512,
+            "whx_f0_channel": 80,
+            "whx_voiced_channel": 81,
+            "whx_sample_rate": 24000,
+            "hift_width": 224,
+            "hift_gen_channels": 192,
+            "hift_style_dim": 64,
+            "hift_body_blocks": 3,
+            "hift_f0_channel": 80,
+            "hift_voiced_channel": 81,
+            "hift_sample_rate": 24000,
+            "stage_projection_bottlenecks": [],
+            "post_filter_channels": 0,
+            "post_filter_layers": 0,
+            "post_filter_kernel": 9,
+            "post_filter_scale": 0.25,
+            "pre_tanh_repair_channels": 0,
+            "pre_tanh_repair_layers": 0,
+            "pre_tanh_repair_kernel": 7,
+            "pre_tanh_repair_scale": 0.15,
+            "istft_n_fft": 1024,
+            "istft_tail_head_rank": 20
+          },
+          "allowed_post_filter_mismatches": [],
+          "allowed_pre_tanh_repair_mismatches": [],
+          "allowed_activation_mismatches": [],
+          "missing_keys": [],
+          "unexpected_keys": []
+        },
+        "post_filter_channels": 0,
+        "post_filter_layers": 0,
+        "post_filter_kernel": 9,
+        "post_filter_scale": 0.25,
+        "pre_tanh_repair_channels": 0,
+        "pre_tanh_repair_layers": 0,
+        "pre_tanh_repair_kernel": 7,
+        "pre_tanh_repair_scale": 0.15,
+        "istft_n_fft": 1024,
+        "istft_tail_head_rank": 20,
+        "ap_amplitude_weight": 0.0,
+        "ap_phase_weight": 0.0,
+        "ap_complex_weight": 0.0,
+        "spectral_head_init": "default",
+        "spectral_head_init_scale": 0.001,
+        "ap_amp_init_bias": -6.0,
+        "ap_phase_real_init_bias": 1.0,
+        "spectral_head_init_summary": null,
+        "feature_exact_weight": 0.0,
+        "feature_exact_keys": [
+          "pre",
+          "up0"
+        ],
+        "feature_exact_teacher_init": null,
+        "signature_pack_dir": null,
+        "exact_feature_pack_dir": null,
+        "signature_hint_weight": 0.0,
+        "signature_temporal_weight": 0.0,
+        "signature_phase_weight": 0.0,
+        "signature_phase_bins": 0,
+        "signature_keys": [
+          "stage0_mix",
+          "stage1_mix",
+          "stage2_mix",
+          "pre_tanh",
+          "audio"
+        ],
+        "bottleneck_code_checkpoint": null,
+        "bottleneck_code_weight": 0.0,
+        "bottleneck_code_keys": [],
+        "bottleneck_code_training_only_parameters": 0,
+        "echo_tail_weight": 0.0,
+        "echo_tail_min_ms": 8.0,
+        "echo_tail_max_ms": 40.0,
+        "echo_tail_lags": 9,
+        "echo_tail_margin": 0.02,
+        "paired_acoustic_residual_weight": 0.0,
+        "paired_acoustic_residual_max_scale": 0.25,
+        "lrc_pred_code_mix_prob": 0.7,
+        "lrc_pred_code_checkpoint": "train/runs/serhiy/student/upstream-real/acoustic/latent-student.pt",
+        "lrc_pred_code_residual_prob": 0.0,
+        "lrc_pred_code_residual_max_scale": 0.25,
+        "lrc_pred_code_cache": {
+          "format": "roota_lrc_pred_code_cache_v1",
+          "cache_dir": "train/runs/serhiy/student/upstream-real/finetune/lrc-pred-code-cache/c392fe80f045c5cd-c40",
+          "checkpoint": "train/runs/serhiy/student/upstream-real/acoustic/latent-student.pt",
+          "checkpoint_key": "c392fe80f045c5cd",
+          "checkpoint_sha256": "fd0b4b32a21e1d3b969266336816043519a8342230cdc5a29737a1333c771973",
+          "code_dim": 40,
+          "samples": 22604,
+          "created": 22604,
+          "reused": 0
+        }
+      }
+    }
+  },
+  "artifacts": {
+    "e2e_audio.bin": {
+      "bytes": 285696,
+      "sha256": "7206eeb321c6781cd8f6d69f8d7b7faf3e98a1655486450831af8e9350a3774a"
+    },
+    "e2e_durs.bin": {
+      "bytes": 436,
+      "sha256": "5a9aa31ab3a067d9cf0a1e73c9798277b1b34b23e6f5cbe3043c0431d3c5ada5"
+    },
+    "e2e_ids.bin": {
+      "bytes": 436,
+      "sha256": "8ba4349be62613ed7e717c66441cd0eb8f20df47d5de3162677e16e0e1f9470c"
+    },
+    "export_report.json": {
+      "bytes": 868,
+      "sha256": "307f8612a558c523f7ff676d565341888f6bab3ae9e245422603cab8ab1f73e4"
+    },
+    "front_q8.bin": {
+      "bytes": 315668,
+      "sha256": "22ad930da117c8be52693d6c95bb69d0cfa1356612e7a06f24d6b7a821c2da96"
+    },
+    "golden_meta.json": {
+      "bytes": 481,
+      "sha256": "4965893ffd299bda3ce9e21be57954ec3369ceebd709a2a7342ed6ee93068db4"
+    },
+    "model/act_scales.h": {
+      "bytes": 82,
+      "sha256": "e1a4cc25ef4ee9b28911af31e6d4ff4b475421e71a002ae2f0242302ee90a77e"
+    },
+    "model/chain_scales.h": {
+      "bytes": 82,
+      "sha256": "e1a4cc25ef4ee9b28911af31e6d4ff4b475421e71a002ae2f0242302ee90a77e"
+    },
+    "model/front_q8_meta.h": {
+      "bytes": 4526,
+      "sha256": "10b8c7123f5be1444bcf3f73e06cee99145988510672bf80107c1b45c04a30f3"
+    },
+    "model/frozen_norm.h": {
+      "bytes": 82,
+      "sha256": "e1a4cc25ef4ee9b28911af31e6d4ff4b475421e71a002ae2f0242302ee90a77e"
+    },
+    "model/fsd_meta.h": {
+      "bytes": 361,
+      "sha256": "c801301950dfeac179b352878b2c5db0b43b263dcb5a0b7fa04e8c0a3519470d"
+    },
+    "model/fsd_q8_meta.h": {
+      "bytes": 4069,
+      "sha256": "767e9ae8d1fd3e2b93b1a6250f378b7e77f612386f1c098fcaaeb49c8946fa57"
+    },
+    "model/rb_scales.h": {
+      "bytes": 82,
+      "sha256": "e1a4cc25ef4ee9b28911af31e6d4ff4b475421e71a002ae2f0242302ee90a77e"
+    },
+    "model_q8.bin": {
+      "bytes": 399484,
+      "sha256": "0c2cc2ed5e41db6ca82809b5420608e03475ef5aab6561557644f8d54f44bca4"
+    }
+  }
+}

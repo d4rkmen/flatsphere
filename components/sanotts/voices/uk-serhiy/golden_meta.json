@@ -1,0 +1,11 @@
+{
+  "row_id": "real_00001_000870",
+  "text": "Ні. Найважливі́ше — це Е́лен. Е́лен і дити́на.",
+  "n_tokens": 109,
+  "frames": 279,
+  "samples": 71424,
+  "durations": "teacher/oracle",
+  "eval_pack": "train/runs/serhiy/packs/upstream-real/pack-eval",
+  "tensor_path": "train/runs/serhiy/packs/upstream-real/pack-eval/tensors/real_00001_000870_chunk00.npz",
+  "tensor_sha256": "feca4ab0c200324f251ef58b03a0266495f028c0b7c304134effa84054cc3931"
+}

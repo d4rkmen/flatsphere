@@ -1,0 +1,15 @@
+{
+  "speaker": "serhiy",
+  "front_bytes": 315668,
+  "model_bytes": 399484,
+  "duration_max_tokens": 255,
+  "eval_pack": "train/runs/serhiy/packs/upstream-real/pack-eval",
+  "eval_rows_sha256": "83b1fc3afc3702cf676d41e8a632d2d5396d62b3f4a34ffa40c1d87afe5b00de",
+  "golden": "teacher/oracle durations",
+  "duration_checkpoint": "train/runs/serhiy/student/upstream-ext/duration/duration-student.pt",
+  "duration_sha256": "f6e2f89e39164fd38a79d9387d97624602404f4ebd326baa2052178826c5b289",
+  "acoustic_checkpoint": "train/runs/serhiy/student/upstream-ext/acoustic/latent-student.pt",
+  "acoustic_sha256": "fd0b4b32a21e1d3b969266336816043519a8342230cdc5a29737a1333c771973",
+  "decoder_checkpoint": "train/runs/serhiy/student/upstream-real-auto-dec/finetune/checkpoint_step400000.pt",
+  "decoder_sha256": "3ef303b25be6a3b0c3df616223da6ff91ee4de2a912888d31a3a69ce29a0846f"
+}
