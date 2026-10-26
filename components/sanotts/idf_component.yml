@@ -1,0 +1,5 @@
+description: "Local pinned sanoTTS inference and compile-time voice bundles"
+version: "0.1.0"
+dependencies:
+  idf: ">=5.5.1"
+# espeak_ng is a repository-local component, linked through CMake REQUIRES.

@@ -1,0 +1,6 @@
+# LVGL's builtin heap is touched per redraw only; internal SRAM is reserved
+# for sanoTTS SIMD weight residency. Draw buffers are already in PSRAM.
+[mapping:lvgl_extram]
+archive: liblvgl__lvgl.a
+entries:
+    * (extram_bss)

@@ -1,0 +1,9 @@
+# The runtime's static working buffers (~60 KB: FFT/OLA scratch, normalization
+# halos, head accumulators) are zero-init and accessed through the data cache.
+# Moving them to PSRAM frees internal SRAM for SIMD weight residency, which is
+# what limits synthesis speed. Kernels stay in their own archive and keep their
+# internal-SRAM activations.
+[mapping:sanotts_runtime_extram]
+archive: libflatsphere_sano_runtime.a
+entries:
+    * (extram_bss)

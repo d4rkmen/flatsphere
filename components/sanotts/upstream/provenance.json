@@ -1,0 +1,107 @@
+{
+  "repository": "https://github.com/Ampixa/sanoTTS",
+  "commit": "939d982b9faa54cbcf5d24cc878f5cd514b2646e",
+  "archive_sha256": "68a9bcc82c568889a6d656c7efa85ba2565ba5b5681c2336229bdc364f67c048",
+  "files": {
+    "upstream/LICENSE": {
+      "source": "LICENSE",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+    },
+    "upstream/LICENSE.MIT": {
+      "source": "LICENSE.MIT",
+      "sha256": "339b999086f9843195e7c83e9583141230b4e3396cb7d4298d38ab2a45f6f935"
+    },
+    "upstream/include/snt_tts.h": {
+      "source": "mcu/include/snt_tts.h",
+      "sha256": "6e0215a900c20a6cffb9c47c04914b22c11b29c8d4b04c3066aa0a48abdb0329"
+    },
+    "upstream/include/snt_port.h": {
+      "source": "mcu/include/snt_port.h",
+      "sha256": "90867aa5e22b1771846e0508be7e517099487c505c8e71ab09fe9e59433d3582"
+    },
+    "upstream/src/snt_tts.c": {
+      "source": "mcu/src/snt_tts.c",
+      "sha256": "abbf43742caa8a7b460f3f6ed964ff988667fb9a60b376e5c4c6c16eebf26a8c"
+    },
+    "upstream/src/snt_kernels_ref.c": {
+      "source": "mcu/src/snt_kernels_ref.c",
+      "sha256": "fa6c8bb6b82c056f9c9c44dbadb954b4b7a0871dc0774862123ead32a5bd5f93"
+    },
+    "upstream/host/snt_port_host.c": {
+      "source": "mcu/ports/host/snt_port_host.c",
+      "sha256": "7e747ca30a72f3f4d842030f825049331e5e69104d55d1a2eabbe9550ee60844"
+    },
+    "upstream/host/golden_main.c": {
+      "source": "mcu/test/golden_main.c",
+      "sha256": "059aa940cf643123fa7f25a418db063b74d7c19c6fbacb8f90c05763f0271881"
+    },
+    "upstream/g2p/esp_g2p.c": {
+      "source": "mcu/ports/esp32s3/firmware/main/esp_g2p.c",
+      "sha256": "f6feddb2eb3fad3c3a5e87ccba9d9f1139668eef7906cca19ada9220f30e19c4"
+    },
+    "upstream/g2p/esp_g2p.h": {
+      "source": "mcu/ports/esp32s3/firmware/main/esp_g2p.h",
+      "sha256": "75c914fd98a326f45383e70a901be95734bef12e0ff896b96e022b79a2baa330"
+    },
+    "upstream/g2p/cp_id_table.h": {
+      "source": "mcu/ports/esp32s3/firmware/main/cp_id_table.h",
+      "sha256": "1fea3ccb191d623cbf75d2d56ecdf1223d11cf5c6b2d189ceeb7b9b44e735533"
+    },
+    "voices/en-kristin/model/front_q8_meta.h": {
+      "source": "mcu/src/model/front_q8_meta.h",
+      "sha256": "8232b8877211f1dc8881f80f88bc6f05132a6942eac3c8e4e48a8be9bf923355"
+    },
+    "voices/en-kristin/model/fsd_meta.h": {
+      "source": "mcu/src/model/fsd_meta.h",
+      "sha256": "6ed1c26e7186bb794b90660f1ce448897785a5c132e904dc4e90adcc89e63488"
+    },
+    "voices/en-kristin/model/fsd_q8_meta.h": {
+      "source": "mcu/src/model/fsd_q8_meta.h",
+      "sha256": "9980db882b3d92d90ffa0184a8490d710dd00bee0a58b9088235cbc8741a63d3"
+    },
+    "voices/en-kristin/model/act_scales.h": {
+      "source": "mcu/src/model/act_scales.h",
+      "sha256": "3a54115b3611f9f0b0c84577009019cdc0f6c62cdf6f1259a6ab7a17db1d7b48"
+    },
+    "voices/en-kristin/model/chain_scales.h": {
+      "source": "mcu/src/model/chain_scales.h",
+      "sha256": "a737764e48a8d3ff0b0225dd67fa485e5c28d96ef6b107bc4ed204cd11af786f"
+    },
+    "voices/en-kristin/model/rb_scales.h": {
+      "source": "mcu/src/model/rb_scales.h",
+      "sha256": "465ca07c40cc07e559edbfab8b842c86789bb62817335d10acc88e65be944877"
+    },
+    "voices/en-kristin/model/frozen_norm.h": {
+      "source": "mcu/src/model/frozen_norm.h",
+      "sha256": "2b87b9bb01db718bbe7b230d1e1835ecb66ce51a0d028f392ebff7ad1b7372b1"
+    },
+    "voices/en-kristin/front_q8.bin": {
+      "source": "mcu/test/fixtures/en_us_r7/front_q8.bin",
+      "sha256": "921b1aea12a3c982ed0aacac2c3c13f2f627797f24203b6bd542c70a7a8964a8"
+    },
+    "voices/en-kristin/model_q8.bin": {
+      "source": "mcu/test/fixtures/en_us_r7/model_q8.bin",
+      "sha256": "e81c2c35572c58b9e94c218866d04acacb316441875ce82cea68bf87c58a7417"
+    },
+    "voices/en-kristin/e2e_ids.bin": {
+      "source": "mcu/test/fixtures/en_us_r7/e2e_ids.bin",
+      "sha256": "da15059e144fc229dac2a88dd7eab0b0f27bd8c3c8da519c5acd69fe3b7d1f8a"
+    },
+    "voices/en-kristin/e2e_durs.bin": {
+      "source": "mcu/test/fixtures/en_us_r7/e2e_durs.bin",
+      "sha256": "e519ecaad80341815cdc4f3f933cef1106583b5f0205f51616f8db27de07a478"
+    },
+    "voices/en-kristin/e2e_audio.bin": {
+      "source": "mcu/test/fixtures/en_us_r7/e2e_audio.bin",
+      "sha256": "f9f69e9e201c4511111b69d61a8e08358749d88c0e3ed9227d4fd4b9c50d5fb5"
+    },
+    "voices/en-kristin/README.md": {
+      "source": "mcu/test/fixtures/en_us_r7/README.md",
+      "sha256": "656be82ca96d7a6abf716b70963df02d52fd865eb4b90c07ea9f474b952eef8b"
+    },
+    "voices/en-kristin/SHA256SUMS": {
+      "source": "mcu/test/fixtures/en_us_r7/SHA256SUMS",
+      "sha256": "837f3b54b4b51b28de9842680c313d1033f393c888419cc4bece4e51b25f1b25"
+    }
+  }
+}

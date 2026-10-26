@@ -1,0 +1,4 @@
+# sdkconfig_rename_old sdkconfig_rename_new
+# Migrates saved configurations from the pre-release voice option names.
+CONFIG_FLATSPHERE_TTS_VOICE_EN       CONFIG_FLATSPHERE_TTS_VOICE_KRISTIN
+CONFIG_FLATSPHERE_TTS_VOICE_UK       CONFIG_FLATSPHERE_TTS_LANG_UK

@@ -176,6 +176,8 @@ namespace HAL
             return false;
         }
 
+        ESP_LOGI(TAG, "I2S output %lu Hz", (unsigned long)_cfg.sample_rate);
+
         // Enable I2S channel
         ret = i2s_channel_enable(_tx_chan);
         if (ret != ESP_OK)

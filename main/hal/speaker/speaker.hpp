@@ -41,7 +41,8 @@ namespace HAL
         int pin_ws = SPEAKER_PIN_WS;
 
         /// Output sampling rate (Hz)
-        uint32_t sample_rate = 48000; // for direct sampling
+        // Matches sanoTTS output so speech bypasses the mixer's linear resampler.
+        uint32_t sample_rate = 22050;
 
         /// Use stereo output
         bool stereo = false;

@@ -9,11 +9,7 @@
 #include "hal/hal_185c.h"
 #include "settings/settings.hpp"
 #include "sdkconfig.h"
-#if CONFIG_FLATSPHERE_TTS_SANO
 #include "flatsphere_sanotts.h"
-#else
-#include "picotts.h"
-#endif
 #include <lvgl.h>
 #include "ui/ui.h"
 #include "esp_random.h"
@@ -30,12 +26,8 @@ static bool speech_available = false;
 static void speak(const char* text)
 {
     if (!speech_available) return;
-#if CONFIG_FLATSPHERE_TTS_SANO
     if (!flatsphere_sanotts_say(text))
         ESP_LOGW(TAG, "Speech unavailable, too long, or queue full; announcement skipped");
-#else
-    picotts_add(text, strlen(text) + 1);
-#endif
 }
 
 #define BATTERY_UPDATE_INTERVAL (5 * 1000)
@@ -43,7 +35,7 @@ static void speak(const char* text)
 #define DIM_TIMEOUT (30 * 1000)
 static const char* week_day_names[] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
 #define GREETING_NUM 8
-#if CONFIG_FLATSPHERE_TTS_VOICE_UK
+#if CONFIG_FLATSPHERE_TTS_LANG_UK
 const char* greetings[GREETING_NUM] = {
     "Привіт! Гарний час почати свій день",
     "Вітаємо у годиннику флет сфера",
@@ -67,15 +59,12 @@ const char* greetings[GREETING_NUM] = {
 };
 #endif
 
-#if CONFIG_FLATSPHERE_TTS_VOICE_UK
+#if CONFIG_FLATSPHERE_TTS_LANG_UK
 static const char* ua_number_fem(int n);
 static const char* ua_minutes_form(int n);
-static const char* ua_hours_form(int n);
+static const char* ua_hour_ordinal(int h);
 static const char* ua_percent(int n);
 #endif
-
-// same core as Speaker task
-#define TTS_CPU_CORE 1
 
 using namespace HAL;
 using namespace SETTINGS;
@@ -137,7 +126,7 @@ static void read_battery_level(void)
     if (abs(level - last_level) > 1)
     {
         last_level = level;
-#if CONFIG_FLATSPHERE_TTS_VOICE_UK
+#if CONFIG_FLATSPHERE_TTS_LANG_UK
         std::string level_str = std::format("рівень заряду батареї {} {}", level, ua_percent(level));
 #else
         std::string level_str = std::format("battery level is {}%", level);
@@ -338,20 +327,12 @@ extern "C" void ui_open_settings(void)
     _ui_screen_change(&ui_SetDate, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 250, 0, &ui_SetDate_screen_init);
 }
 
-#if CONFIG_FLATSPHERE_TTS_SANO
 static int on_sano_samples(const int16_t* samples, size_t size, void*)
 {
     return hal.speaker()->playRawBlocking(1, samples, size, 22050) ? 0 : 1;
 }
-#else
-static void on_samples(int16_t* samples, size_t size)
-{
-    // Pico reuses its callback buffer: wait until the mixer releases it.
-    hal.speaker()->playRawBlocking(1, samples, size, PICOTTS_SAMPLE_FREQ_HZ);
-}
-#endif
 
-#if CONFIG_FLATSPHERE_TTS_VOICE_UK
+#if CONFIG_FLATSPHERE_TTS_LANG_UK
 // Ukrainian numeral agreement helpers (feminine nominative for the clock).
 static const char* ua_number_fem(int n)
 {
@@ -377,14 +358,12 @@ static const char* ua_minutes_form(int n)
     if (r >= 2 && r <= 4) return "хвилини";
     return "хвилин";
 }
-static const char* ua_hours_form(int n)
+// Clock hours are ordinal feminine: "дев'ята година", not "дев'ять годин".
+static const char* ua_hour_ordinal(int h)
 {
-    int m = n % 100;
-    if (m >= 11 && m <= 14) return "годин";
-    int r = n % 10;
-    if (r == 1) return "година";
-    if (r >= 2 && r <= 4) return "години";
-    return "годин";
+    static const char* names[] = {"перша", "друга", "третя", "четверта", "п'ята", "шоста",
+                                  "сьома", "восьма", "дев'ята", "десята", "одинадцята", "дванадцята"};
+    return (h >= 1 && h <= 12) ? names[h - 1] : "";
 }
 static const char* ua_percent(int n)
 {
@@ -405,7 +384,7 @@ static void say_time(struct tm* timeinfo)
 
     std::string time_str;
 
-#if CONFIG_FLATSPHERE_TTS_VOICE_UK
+#if CONFIG_FLATSPHERE_TTS_LANG_UK
     if (hour == 0 && minute == 0)
     {
         time_str = "зараз північ";
@@ -417,7 +396,7 @@ static void say_time(struct tm* timeinfo)
     else
     {
         int h = hour_12 == 0 ? 12 : hour_12;
-        time_str = std::format("зараз {} {}", ua_number_fem(h), ua_hours_form(h));
+        time_str = std::format("зараз {} година", ua_hour_ordinal(h));
         if (minute > 0)
             time_str += std::format(" {} {}", ua_number_fem(minute), ua_minutes_form(minute));
     }
@@ -490,13 +469,11 @@ esp_err_t setup()
 #endif
     ESP_RETURN_ON_ERROR(hal.speaker()->begin(), TAG, "Failed to start speaker");
     hal.speaker()->reserveChannel(1);
-    hal.speaker()->setVolume(settings.getNumber("system", "volume"));
+    // hal.speaker()->setVolume(settings.getNumber("system", "volume"));
+    hal.speaker()->setVolume(255);
+    hal.speaker()->setAllChannelVolume(255);
     // A speech failure must not prevent the clock UI from starting.
-#if CONFIG_FLATSPHERE_TTS_SANO
     speech_available = flatsphere_sanotts_init(on_sano_samples, nullptr) == ESP_OK;
-#else
-    speech_available = picotts_init(6, on_samples, TTS_CPU_CORE);
-#endif
     if (!speech_available)
     {
         ESP_LOGE(TAG, "Speech unavailable; continuing with clock UI");

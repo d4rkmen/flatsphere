@@ -12,10 +12,20 @@ extern "C" {
 #include <algorithm>
 #include <atomic>
 #include <cmath>
+
+extern "C" {
+bool snt_port_init(void);
+extern void *snt_port_res_arena;
+extern size_t snt_port_res_cap;
+}
 #include <cstring>
 
 namespace {
 constexpr size_t arena_bytes = 2 * 1024 * 1024;
+// Decoder residency peaks at ~132 KiB (head 74 KiB + pw/film banks 58 KiB).
+// Weights that do not fit stay in PSRAM and use the scalar kernels.
+constexpr size_t res_arena_max = 136 * 1024;
+constexpr size_t internal_reserve = 48 * 1024;
 constexpr size_t pcm_capacity = 640 * 256; // capped by patched runtime
 constexpr unsigned sample_rate = 22050;
 // ESP-IDF task stack sizes are bytes. eSpeak MakePhonemeList alone needs
@@ -61,13 +71,26 @@ void worker(void *)
         vTaskDelete(nullptr);
         return;
     }
-    ESP_LOGI(TAG, "sanoTTS ready (scalar, PSRAM); PCM %u Hz; stack %lu bytes",
+    // Allocated after the worker stack and G2P so they keep internal RAM first.
+    {
+        size_t largest = heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+        size_t free_bytes = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
+        size_t budget = free_bytes > internal_reserve ? free_bytes - internal_reserve : 0;
+        size_t res_bytes = std::min({res_arena_max, budget, largest > 1024 ? largest - 1024 : 0}) & ~size_t(15);
+        if (res_bytes >= 16 * 1024)
+            snt_port_res_arena = heap_caps_aligned_alloc(16, res_bytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+        snt_port_res_cap = snt_port_res_arena ? res_bytes : 0;
+        bool dual = snt_port_init();
+        ESP_LOGI(TAG, "SIMD residency %u bytes (internal free %u, largest %u); dual-core %s",
+                 static_cast<unsigned>(snt_port_res_cap),
+                 static_cast<unsigned>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL)),
+                 static_cast<unsigned>(largest), dual ? "on" : "off");
+    }
+    ESP_LOGI(TAG, "sanoTTS ready (PIE SIMD + dual-core); PCM %u Hz; stack %lu bytes",
              sample_rate, static_cast<unsigned long>(worker_stack_bytes));
-#if CONFIG_FLATSPHERE_TTS_UK_MYKYTA
-    ESP_LOGI(TAG, "Voice: Ukrainian Mykyta");
-#if CONFIG_FLATSPHERE_TTS_MYKYTA_DEVICE_TEST
-    ESP_LOGW(TAG, "EXPERIMENTAL DEVICE TEST: Mykyta export has not passed parity acceptance");
-#endif
+    ESP_LOGI(TAG, "Voice: %s", SANOTTS_VOICE_NAME);
+#if SANOTTS_VOICE_EXPERIMENTAL
+    ESP_LOGW(TAG, "EXPERIMENTAL: voice has not passed quality/parity acceptance");
 #endif
     Request request;
     int ids[256];
@@ -96,10 +119,12 @@ void worker(void *)
             ESP_LOGW(TAG, "Synthesis rejected (%d); no partial audio played", rc);
             continue;
         }
-        ESP_LOGI(TAG, "%d samples synthesized in %lld us; stack minimum free %lu bytes", stats.samples,
-             static_cast<long long>(stats.elapsed_us),
+        // Newlib nano printf has no %lld; report milliseconds as unsigned long.
+        ESP_LOGI(TAG, "%d samples (%lu ms audio) synthesized in %lu ms; stack minimum free %lu bytes",
+             stats.samples, static_cast<unsigned long>(stats.samples * 1000ULL / sample_rate),
+             static_cast<unsigned long>(stats.elapsed_us / 1000),
              static_cast<unsigned long>(uxTaskGetStackHighWaterMark(nullptr)));
-        // Whole-utterance buffering avoids underruns with the scalar port.
+        // Whole-utterance buffering keeps playback independent of synthesis speed.
         // The sink blocks until the mixer releases this buffer.
         if (audio_size && output(audio, audio_size, output_user) != 0)
             ESP_LOGW(TAG, "Playback failed");

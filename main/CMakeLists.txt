@@ -14,6 +14,7 @@ idf_component_register(SRCS "main.cpp" ${HAL_SRCS} ${SETTINGS_SRCS} ${UI_SRCS}
     INCLUDE_DIRS "." "ui" "hal" "settings"
     REQUIRES spi_flash fatfs esp_wifi json esp_lcd driver nvs_flash esp_timer esp_adc usb usb_host_msc sanotts
     EMBED_FILES assets/coin16.wav assets/error.wav assets/usb_connected.wav assets/usb_disconnected.wav
+    LDFRAGMENTS "linker.lf"
 )
                     
 
