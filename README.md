@@ -158,7 +158,9 @@ The minimal pinned inference sources and both voice bundles live in
 `components/sanotts`. Select one voice in **FlatSphere speech → Voice**
 (Serhiy by default); the announcement language follows the voice. See
 [choosing a voice](components/sanotts/README.md#choosing-a-voice).
-Serhiy passes listening review but not the numeric int8 parity gate.
+Serhiy passes listening review but not the numeric int8 parity gate; its model
+card and samples are at
+[huggingface.co/dmytro-m/ua-serhiy-0p58m](https://huggingface.co/dmytro-m/ua-serhiy-0p58m).
 
 Both speech engines are vendored local components: no registry eSpeak package
 or build-time source download is needed. Ukrainian-voice firmware builds with

@@ -100,6 +100,24 @@ User-observed playback is not numerical acceptance.
 | `voices/en-kristin` | Pinned upstream R7 fixture | 0.989231 | Passes >0.98; earlier user-reported playback |
 | `voices/uk-serhiy` | Serhiy 400k student export | 0.959100 | Listening-quality voice; int8 parity below the 0.98 gate |
 
+### Serhiy (`voices/uk-serhiy`)
+
+Ukrainian male voice distilled from the Piper `uk_UA-serhiy-high` teacher on a
+lexical-stress-annotated corpus. Model card, FP16 weights, audio samples and
+reference inference:
+[huggingface.co/dmytro-m/ua-serhiy-0p58m](https://huggingface.co/dmytro-m/ua-serhiy-0p58m).
+
+| Property | Value |
+| --- | --- |
+| Architecture | sanoTTS R7 layout: duration + 40-channel LRC acoustic bottleneck + five-block FSD/iSTFT decoder (not PiperLite) |
+| Parameters | 575,888 (duration 40,292, acoustic 204,288, decoder 331,308) |
+| Audio | 22,050 Hz mono, 256-sample hop |
+| Input | Piper phoneme IDs via eSpeak `uk`; explicit U+0301 stress marks honoured; ≤255 IDs per call |
+| Embedded int8 blobs | `front_q8.bin` 315,668 B, `model_q8.bin` 399,484 B (~698 KiB in flash) |
+| Checkpoint | `upstream-real-auto-dec` decoder at 400,000 steps; duration/acoustic from `upstream-ext` |
+| Host int8 golden | corr 0.959100, rms_ratio 0.999708 (gate >0.98 not met) |
+| Licensing | Export GPL-3.0; teacher Apache-2.0; dataset MIT — see the model card `NOTICE.md` |
+
 Serhiy front SHA-256:
 `22ad930da117c8be52693d6c95bb69d0cfa1356612e7a06f24d6b7a821c2da96`; decoder:
 `0c2cc2ed5e41db6ca82809b5420608e03475ef5aab6561557644f8d54f44bca4`.
