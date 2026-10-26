@@ -28,7 +28,7 @@
 This is demo project for WaveShare ESP32-S3 Touch LCD 1.85C board. It contains drivers and setups for all hardware components. It can be the base of your own project on this board.
 
 - 🕐 **Analog Watch Face** - Beautiful round clock display with smooth second hand animation
-- 🔊 **Text-to-Speech** - Announces time every minute using local PicoTTS engine
+- 🔊 **Text-to-Speech** - Local sanoTTS and eSpeak NG with Serhiy (Ukrainian) or Kristin (English) voice
 - 🔋 **Battery Monitoring** - Real-time battery level display with voice announcements
 - ⏰ **Time/Date Settings** - Interactive UI for setting time and date
 - 🌍 **Timezone Support** - Multiple timezone configurations with DST handling (not implemented in Settings UI)
@@ -83,7 +83,8 @@ This is demo project for WaveShare ESP32-S3 Touch LCD 1.85C board. It contains d
 | ----------- | ------- | ------------------------------------ |
 | **ESP-IDF** | ≥5.5.1  | Espressif IoT Development Framework  |
 | **LVGL**    | ^9.4.0  | Light and Versatile Graphics Library |
-| **PicoTTS** | 1.x     | SVOX Pico Text-to-Speech Engine      |
+| **sanoTTS** | pinned local R7 | Neural speech and complete voice bundles |
+| **eSpeak NG** | pinned local 1.52.0 | EN/UK phoneme-only translator and data |
 
 ### Implemented Drivers
 
@@ -151,23 +152,22 @@ Use `idf.py menuconfig` to configure project settings.
 
 ## Important Notes
 
-### PicoTTS SPIRAM Modification
+### Speech publication status
 
-The `esp_picotts` component requires a modification to use SPIRAM (PSRAM) for memory allocation. This is necessary because the TTS engine requires significant memory that may not fit in internal RAM.
+The minimal pinned inference sources and both voice bundles live in
+`components/sanotts`. Select one voice in **FlatSphere speech → Voice**
+(Serhiy by default); the announcement language follows the voice. See
+[choosing a voice](components/sanotts/README.md#choosing-a-voice).
+Serhiy passes listening review but not the numeric int8 parity gate.
 
-In the PicoTTS library file `esp_picotts.c`, change the memory allocation:
+Both speech engines are vendored local components: no registry eSpeak package
+or build-time source download is needed. Ukrainian-voice firmware builds with
+ESP-IDF 5.5.4 (38% app partition free). See
+[publication notes](components/sanotts/README.md) and
+[eSpeak data/licensing limits](components/espeak_ng/README.md).
 
-```c
-// Original (uses internal RAM):
-picoMemArea = malloc(PICO_MEM_SIZE);
-
-// Modified (uses SPIRAM):
-picoMemArea = heap_caps_malloc(PICO_MEM_SIZE, MALLOC_CAP_SPIRAM);
-```
-
-**Or** set `CONFIG_SPIRAM_USE_MALLOC=y` in sdkconfig, but then PSRAM will be used for all allocations, not just TTS.
-
-This modification ensures the TTS engine utilizes the 8MB PSRAM available on the board.
+Factory NVS is excluded from full-flash inputs by default. Keep
+`FLATSPHERE_FLASH_FACTORY_NVS` disabled to preserve saved settings.
 
 ## Project Structure
 
@@ -204,6 +204,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
+The following applies to original project code, not all third-party sources
+or weights. The eSpeak-linked firmware has GPL obligations; preserve the
+[speech component notices](components/sanotts/README.md) and review voice/data
+redistribution rights before publication.
+
 ```
 Copyright 2024-2025 d4rkmen
 
@@ -230,7 +235,8 @@ limitations under the License.
 - [LVGL](https://lvgl.io/) for the graphics library
 - [SquareLine Studio](https://squareline.io/) for the UI design tool
 - [WaveShare](https://www.waveshare.com/) for the hardware platform
-- [SVOX Pico](https://github.com/jmattsson/picotts) for the TTS engine
+- [Ampixa sanoTTS](https://github.com/Ampixa/sanoTTS) for neural speech inference
+- [eSpeak NG](https://github.com/espeak-ng/espeak-ng) for phonemization
 - [LVGL_Watchface](https://github.com/moononournation/LVGL_Watchface) for the watchface graphics + UI
 
 ---
