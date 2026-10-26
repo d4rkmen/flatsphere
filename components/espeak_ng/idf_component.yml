@@ -1,0 +1,4 @@
+description: "Local pinned eSpeak NG 1.52.0 G2P-only subset and EN/UK data"
+version: "1.52.0"
+dependencies:
+  idf: ">=5.5.1"

@@ -1,0 +1,537 @@
+{
+  "repositories": {
+    "espeak-ng": {
+      "url": "https://github.com/espeak-ng/espeak-ng",
+      "commit": "4870adfa25b1a32b4361592f1be8a40337c58d6c",
+      "archive_sha256": "cd83f84c4e495f281ac14e919aecf2834306ec1ea1b498de8ef6000f3a0f90de"
+    },
+    "sanoTTS": {
+      "url": "https://github.com/Ampixa/sanoTTS",
+      "commit": "939d982b9faa54cbcf5d24cc878f5cd514b2646e",
+      "archive_sha256": "68a9bcc82c568889a6d656c7efa85ba2565ba5b5681c2336229bdc364f67c048"
+    }
+  },
+  "data_note": "Existing working G2P-only data: pinned port English dictionary/definitions and 4KiB phondata stub, full installed UK tables/dictionary. Original Piper build revision not established; hashes identify the exact bytes, not legal clearance.",
+  "files": {
+    "upstream/COPYING": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/COPYING",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "bytes": 35147
+    },
+    "upstream/COPYING.APACHE": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/COPYING.APACHE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    "upstream/COPYING.BSD2": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/COPYING.BSD2",
+      "sha256": "a8b0c1c7d7af6c0415c068be8cf373799d1a42b0707b79dc4ccfcaf593cd902d",
+      "bytes": 1244
+    },
+    "upstream/COPYING.UCD": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/COPYING.UCD",
+      "sha256": "be029c50df83105a810e391778b6edcb522d6cb4b4e142332aca54437a499bf7",
+      "bytes": 2788
+    },
+    "upstream/src/include/compat/endian.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/endian.h",
+      "sha256": "d9d0517fa9a3b2caabbbe84c5c003526779b1056549e7f08dbd0ce3b30c26875",
+      "bytes": 3768
+    },
+    "upstream/src/include/compat/getopt.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/getopt.h",
+      "sha256": "95a2ba0e9f6765148c74bf54e237c18ea36d668a57d21c2003595c4a2d16b1e3",
+      "bytes": 1360
+    },
+    "upstream/src/include/compat/math.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/math.h",
+      "sha256": "c76fbdcddfc9a922b0a29e52ef20fdd28bf88804d5334a58597b14297792d0f8",
+      "bytes": 1108
+    },
+    "upstream/src/include/compat/stdint.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/stdint.h",
+      "sha256": "a8b70c0cc85d5dce8ade8edeb3e3d74868dbdd3cc43a90dff007a8cf4684b675",
+      "bytes": 1526
+    },
+    "upstream/src/include/compat/stdio.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/stdio.h",
+      "sha256": "cec378f30afd807d10c3153b92ab0dd0707f90be915edf34e428984d7b15d4ad",
+      "bytes": 1147
+    },
+    "upstream/src/include/compat/string.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/string.h",
+      "sha256": "839f6c027a2f67c30d8ac077fac945b7e3e7e19a88cb6889ecda261e38092c85",
+      "bytes": 1195
+    },
+    "upstream/src/include/compat/strings.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/strings.h",
+      "sha256": "8ab483f7c6c556ac98072564845822cd82773cd14c2af5f95738dce986816d0a",
+      "bytes": 986
+    },
+    "upstream/src/include/compat/sys/stat.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/sys/stat.h",
+      "sha256": "f75eeb63683b3be83b9fa1b4f0fd511fbc9c05cc6da02ac3eb5772c49569d7ff",
+      "bytes": 1254
+    },
+    "upstream/src/include/compat/unistd.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/unistd.h",
+      "sha256": "8212bc3d2ad7eaae5a96f13399f7842793c7887dcbbc34578d4e6cc94f75deaa",
+      "bytes": 945
+    },
+    "upstream/src/include/compat/wchar.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/wchar.h",
+      "sha256": "f77dcf954b65de083734b702119304240c4e11c8179ada0a6afcfd804033fadb",
+      "bytes": 1092
+    },
+    "upstream/src/include/compat/wctype.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/compat/wctype.h",
+      "sha256": "1f70c90c9ba2ef7fef4d2d2e1734f047b1af697c0b0b0ed1d808491a92dc4ed1",
+      "bytes": 1516
+    },
+    "upstream/src/include/espeak-ng/encoding.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/espeak-ng/encoding.h",
+      "sha256": "cfdea69c66f1b309717894fa8682e761d7a49448e6a17abdd015bbd85e6de0d5",
+      "bytes": 3117
+    },
+    "upstream/src/include/espeak-ng/espeak_ng.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/espeak-ng/espeak_ng.h",
+      "sha256": "cc4557b73e583bff99ae6703b9685d573713e6c28edecd44030e5def47384051",
+      "bytes": 6788
+    },
+    "upstream/src/include/espeak-ng/speak_lib.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/include/espeak-ng/speak_lib.h",
+      "sha256": "3218ca1573c58f0191830425ca2ebc823f63895de5967b0d1dced987830bfdce",
+      "bytes": 25839
+    },
+    "upstream/src/libespeak-ng/common.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/common.c",
+      "sha256": "b5a2fc40da61e23b55b7f79f8f8db93ec03f3bd5ede2ac4c02586ba564c335ab",
+      "bytes": 8038
+    },
+    "upstream/src/libespeak-ng/common.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/common.h",
+      "sha256": "5e43e56b90fc333efb654f3edeffbd0308a432a3e942ab37e0d5172c78e3a152",
+      "bytes": 1724
+    },
+    "upstream/src/libespeak-ng/compiledata.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/compiledata.c",
+      "sha256": "70d5996bfc85fb39bab210b0e6c79d5d46a1574d9a02dfca8bcfaaf4230ca244",
+      "bytes": 71564
+    },
+    "upstream/src/libespeak-ng/compiledict.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/compiledict.c",
+      "sha256": "ce74d0ce87f03149148d545bf62882e26a829035bf553e9543b319fb10ba9c13",
+      "bytes": 40944
+    },
+    "upstream/src/libespeak-ng/compiledict.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/compiledict.h",
+      "sha256": "e9f5bc591463b2fdfa38f1ec712ee148088b350131a7a2e11c77ad9063c2e45e",
+      "bytes": 1155
+    },
+    "upstream/src/libespeak-ng/dictionary.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/dictionary.c",
+      "sha256": "c69a0e4a8364b27a93532b3f7b867459bcf143e1e4d305b1857a293e105802da",
+      "bytes": 88829
+    },
+    "upstream/src/libespeak-ng/dictionary.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/dictionary.h",
+      "sha256": "05f2b11ae9bf880365fb1d1fa91e1604754787f3fe35fd94bc7741837698ca2d",
+      "bytes": 2573
+    },
+    "upstream/src/libespeak-ng/encoding.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/encoding.c",
+      "sha256": "c1a81adb11f953eca4e5a52a83faa1ad0e96f63f2829510888f7d4e9f4a6b090",
+      "bytes": 37603
+    },
+    "upstream/src/libespeak-ng/error.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/error.c",
+      "sha256": "42ea187e06c57ee97988ea6ce289ad597a75dc16396c2df6319168155a79725c",
+      "bytes": 5000
+    },
+    "upstream/src/libespeak-ng/error.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/error.h",
+      "sha256": "92c4d98fc38b5f45bb1af37a37021026817a81860362c2f40497aa17d45194c1",
+      "bytes": 1557
+    },
+    "upstream/src/libespeak-ng/espeak_api.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/espeak_api.c",
+      "sha256": "991f31a5aa592d46658095916246afa0489f63a36768359285887ab8afd49783",
+      "bytes": 5580
+    },
+    "upstream/src/libespeak-ng/espeak_command.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/espeak_command.h",
+      "sha256": "1400958c57b5957f261050e86b9997e17cefd281cc66c641b5c3dc6e687b0a25",
+      "bytes": 4385
+    },
+    "upstream/src/libespeak-ng/event.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/event.h",
+      "sha256": "ba1d010c2f9d762463143f3c4a0a9684bc5ed9110b9e2f87a4ed81577a8ccaaa",
+      "bytes": 2212
+    },
+    "upstream/src/libespeak-ng/fifo.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/fifo.h",
+      "sha256": "8ad047ef2cc73fe0d8fdb05d8496dc69d6ad765ba87547ce69211ad692cee7f0",
+      "bytes": 2315
+    },
+    "upstream/src/libespeak-ng/ieee80.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/ieee80.c",
+      "sha256": "9f7b27f991f1e3306bf5601c24de23a4de36ec3ca2c3a4c33afb332aac8e2230",
+      "bytes": 2091
+    },
+    "upstream/src/libespeak-ng/ieee80.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/ieee80.h",
+      "sha256": "3879b50453f629c2a0652930085503919107f84ea9eea76ace46137b4440baac",
+      "bytes": 55
+    },
+    "upstream/src/libespeak-ng/intonation.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/intonation.c",
+      "sha256": "8756820e189bb5c067dfd8db6d93c777376c035c8cece24234fecab1cc67e83a",
+      "bytes": 36514
+    },
+    "upstream/src/libespeak-ng/intonation.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/intonation.h",
+      "sha256": "45651af0b2a1f4f8776821f33d0f1de10287994b210bf573d54a4abc34359d37",
+      "bytes": 1041
+    },
+    "upstream/src/libespeak-ng/klatt.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/klatt.h",
+      "sha256": "2728b7c61719f388b4d8baa767779cf6f432527c592c1943820397d1914a045b",
+      "bytes": 6075
+    },
+    "upstream/src/libespeak-ng/langopts.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/langopts.c",
+      "sha256": "02ad9680d30fd9caf4375f16df8d58571d5caaf1d004547537e46446e177c451",
+      "bytes": 6817
+    },
+    "upstream/src/libespeak-ng/langopts.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/langopts.h",
+      "sha256": "5c7a802c5c2dbf2e0695358dce5aee4ac5375d580ef0e579a3b3c68664f11be6",
+      "bytes": 1075
+    },
+    "upstream/src/libespeak-ng/mbrola.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/mbrola.h",
+      "sha256": "366aa9ce7bf79f9ca8c36a386b5821388c1169e545bbd57a62cfe1b84767cdff",
+      "bytes": 1674
+    },
+    "upstream/src/libespeak-ng/mbrowrap.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/mbrowrap.h",
+      "sha256": "052d5e59dcf48300da7fc9e8d482d7a98bf1a099c46018fd06a5dc22bed00f4e",
+      "bytes": 3272
+    },
+    "upstream/src/libespeak-ng/mnemonics.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/mnemonics.c",
+      "sha256": "052f74535078139599c7fb37bf8701720eaabc261d7fd7630ce73df48e63f059",
+      "bytes": 1331
+    },
+    "upstream/src/libespeak-ng/mnemonics.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/mnemonics.h",
+      "sha256": "59455ca63c5540ef0ab46274e023a53f03119a20455f97d8c8b03e6f61b7743d",
+      "bytes": 1150
+    },
+    "upstream/src/libespeak-ng/numbers.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/numbers.c",
+      "sha256": "0d91d2c768b63deae442e5c0f0ab0e311422c829f9acaafa3a90f9d804750ffb",
+      "bytes": 50509
+    },
+    "upstream/src/libespeak-ng/numbers.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/numbers.h",
+      "sha256": "ec4f8b8bd660700fefd11cb596440e0d035be6252cc780018b2bcaadd472237f",
+      "bytes": 1467
+    },
+    "upstream/src/libespeak-ng/phoneme.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/phoneme.c",
+      "sha256": "75c7f9d13ace78c6f1abff7eed408ea1fc7f00848c346e6ba0ec92db654e6d95",
+      "bytes": 5162
+    },
+    "upstream/src/libespeak-ng/phoneme.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/phoneme.h",
+      "sha256": "9f9d91ed07885b227cce551cdbad9cf620c2945d44a8e90edf910af9646d7d75",
+      "bytes": 9161
+    },
+    "upstream/src/libespeak-ng/phonemelist.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/phonemelist.c",
+      "sha256": "2f7ba6165108c91402e96388cf9b2e4cef048577ddad2814351ad25ea7772e82",
+      "bytes": 18653
+    },
+    "upstream/src/libespeak-ng/phonemelist.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/phonemelist.h",
+      "sha256": "bc6542ab4aa332c1542de765de73f7731d239b52d4026ab0c0963b63890a6f79",
+      "bytes": 1067
+    },
+    "upstream/src/libespeak-ng/readclause.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/readclause.c",
+      "sha256": "5d110a4478727f16509519de3c4c11c536577ae83c967a04ddd92d01bc712432",
+      "bytes": 30108
+    },
+    "upstream/src/libespeak-ng/readclause.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/readclause.h",
+      "sha256": "556906a5c226aa3f6a4039328ad9f9d513fc1a6cea206cc6d1e26980cde0ae7f",
+      "bytes": 1416
+    },
+    "upstream/src/libespeak-ng/sPlayer.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/sPlayer.h",
+      "sha256": "d2266241fb5ef5f8b1b06fde38ff5e6791bde4ac06d047ac260a16e4849d4234",
+      "bytes": 389
+    },
+    "upstream/src/libespeak-ng/setlengths.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/setlengths.c",
+      "sha256": "0eeaec2846ea158ebb49573c064b8aca022954371945791ad44c2d3be33da0d3",
+      "bytes": 22585
+    },
+    "upstream/src/libespeak-ng/setlengths.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/setlengths.h",
+      "sha256": "3052c91027c348009251ead97f3cb39ffd88194b82c9e559f91ec66687c86fa6",
+      "bytes": 1148
+    },
+    "upstream/src/libespeak-ng/sintab.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/sintab.h",
+      "sha256": "c58ad93a2195532b37d67e9bcac552d77dd541856d4d55b9a94136f19c58d2a5",
+      "bytes": 14345
+    },
+    "upstream/src/libespeak-ng/soundicon.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/soundicon.c",
+      "sha256": "5e8bf4217f493ad47c4ce05a5ea7d0d34a8b6c68ae39501a0db779991270342c",
+      "bytes": 5252
+    },
+    "upstream/src/libespeak-ng/soundicon.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/soundicon.h",
+      "sha256": "77746328853f96051508aeca1ab4aec724ec95441290f9c9d6d9ded4751f1f30",
+      "bytes": 1341
+    },
+    "upstream/src/libespeak-ng/spect.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/spect.c",
+      "sha256": "3120ffefbcad67ab10e482d5f107296c7bcad87ece976a7eb51dd83c0824b123",
+      "bytes": 10881
+    },
+    "upstream/src/libespeak-ng/spect.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/spect.h",
+      "sha256": "5ccd98b047739662db9a81fd37428d1704c981dc96acacda3aee1e25c31ac1a6",
+      "bytes": 2666
+    },
+    "upstream/src/libespeak-ng/speech.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/speech.c",
+      "sha256": "70584c853082141ae4c1de6254e4601085ea0ca06054fb8055852fb2768a70bf",
+      "bytes": 26678
+    },
+    "upstream/src/libespeak-ng/speech.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/speech.h",
+      "sha256": "bd314598b9423b6a7d4aacf261d7012eef6467b7d1058910882bea9c78f722db",
+      "bytes": 2256
+    },
+    "upstream/src/libespeak-ng/ssml.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/ssml.c",
+      "sha256": "0898e35df4b946233b77a7311be47737f570e9d24eef47b90f3c2b2a9acbefde",
+      "bytes": 30337
+    },
+    "upstream/src/libespeak-ng/ssml.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/ssml.h",
+      "sha256": "9a5d7cc062dc2fa1e004483849670cf12057601cda243f9a0aa81cd8841f0ffd",
+      "bytes": 2776
+    },
+    "upstream/src/libespeak-ng/synthdata.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/synthdata.c",
+      "sha256": "776465e7139b8c0e349b0948a8c48a3f2d4ef5e75fe32017ca2de23aa06d465b",
+      "bytes": 24826
+    },
+    "upstream/src/libespeak-ng/synthdata.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/synthdata.h",
+      "sha256": "46f6315027e2145bab900277a9c9e10a467ea0bfa9a1b0b37a9f4c40fcb09f22",
+      "bytes": 1940
+    },
+    "upstream/src/libespeak-ng/synthesize.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/synthesize.c",
+      "sha256": "ed4aca3492fbf17f2fed9c3c7cdcc544743395de082e5f6a90c8dcdb918ec419",
+      "bytes": 41864
+    },
+    "upstream/src/libespeak-ng/synthesize.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/synthesize.h",
+      "sha256": "db8ebcf0c12c2c5bf0996fd588bf2d4c4240b196922bdd0640576215ec8b9b53",
+      "bytes": 15058
+    },
+    "upstream/src/libespeak-ng/tr_languages.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/tr_languages.c",
+      "sha256": "83173f257cd5302f8bb0b9ba7a164bdf5e237e01bf336aaa6eda423da4a612fd",
+      "bytes": 72870
+    },
+    "upstream/src/libespeak-ng/translate.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/translate.c",
+      "sha256": "9c987c67db6a6be7bc37498c029bcc19dd91fdedc521ddeac7e7bba81ec9ea23",
+      "bytes": 53322
+    },
+    "upstream/src/libespeak-ng/translate.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/translate.h",
+      "sha256": "8ff32baadc5a45e502e3151f8804a704916d9d9d27ac8a74a78e7e484185d271",
+      "bytes": 31149
+    },
+    "upstream/src/libespeak-ng/translateword.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/translateword.c",
+      "sha256": "ee4cb14c6fccd961b4de863ad284acc8585322d92546e8be460721996a010965",
+      "bytes": 36954
+    },
+    "upstream/src/libespeak-ng/translateword.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/translateword.h",
+      "sha256": "6986ebf368deb77c5d4eeee029dba7e48d708c938f6bbfb7a606a4fa01346f25",
+      "bytes": 1218
+    },
+    "upstream/src/libespeak-ng/voice.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/voice.h",
+      "sha256": "68fb5aea4e09c8f6500adc906a275def3ef585e982dcbfc0fdca0e2894c4db6d",
+      "bytes": 5728
+    },
+    "upstream/src/libespeak-ng/voices.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/voices.c",
+      "sha256": "6509cec3f144adf22338eb0a822915ed28262133864a47f1b2464922f9fc7a01",
+      "bytes": 40280
+    },
+    "upstream/src/libespeak-ng/wavegen.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/wavegen.c",
+      "sha256": "9f327bb75ed2fd27535f58deef06fb51c994ab53e6ec7d05ea3f04eca78100d4",
+      "bytes": 40441
+    },
+    "upstream/src/libespeak-ng/wavegen.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/libespeak-ng/wavegen.h",
+      "sha256": "f2564d6fdb8227b10e243fc31c46cf73039051c7115c5caa4dbf362984d70be8",
+      "bytes": 1791
+    },
+    "upstream/src/ucd-tools/COPYING": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/ucd-tools/COPYING",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "bytes": 35147
+    },
+    "upstream/src/ucd-tools/COPYING.UCD": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/ucd-tools/COPYING.UCD",
+      "sha256": "be029c50df83105a810e391778b6edcb522d6cb4b4e142332aca54437a499bf7",
+      "bytes": 2788
+    },
+    "upstream/src/ucd-tools/src/case.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/ucd-tools/src/case.c",
+      "sha256": "04622da7360518fb8feb94a0e53e75f281b2a530690626a142d9522767bda3d7",
+      "bytes": 127584
+    },
+    "upstream/src/ucd-tools/src/categories.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/ucd-tools/src/categories.c",
+      "sha256": "edd26047254c98d65936f1f4237feb2389acb1cce3733a2b693e1a9b9f333880",
+      "bytes": 197003
+    },
+    "upstream/src/ucd-tools/src/ctype.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/ucd-tools/src/ctype.c",
+      "sha256": "7c3a160f572c19d9b429aff57cfec9eb526b47535bcb96f747fadc5601d6ba93",
+      "bytes": 4692
+    },
+    "upstream/src/ucd-tools/src/include/ucd/ucd.h": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/ucd-tools/src/include/ucd/ucd.h",
+      "sha256": "4d0f07930384e2a57a4abeb433bd3fef35a5904b2c5ce6ad6ee30f72ddfde67f",
+      "bytes": 48525
+    },
+    "upstream/src/ucd-tools/src/proplist.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/ucd-tools/src/proplist.c",
+      "sha256": "6a96e07b90ca58a9b807f6cf8ece6294f4864ba017e99c0574aeb235b0d41053",
+      "bytes": 128122
+    },
+    "upstream/src/ucd-tools/src/scripts.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/ucd-tools/src/scripts.c",
+      "sha256": "01ad466cf4a176928f058ff55ec04ee5bedb4cb1d7eb849a3cc6c4184013280e",
+      "bytes": 277601
+    },
+    "upstream/src/ucd-tools/src/tostring.c": {
+      "source": "espeak-ng@4870adfa25b1a32b4361592f1be8a40337c58d6c/src/ucd-tools/src/tostring.c",
+      "sha256": "4f5a4b311d5f2388e7c2473192ea42bfd6445fda16df75cf35b6d70a9cdeea91",
+      "bytes": 4459
+    },
+    "port/LICENSE.sanoTTS": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/LICENSE",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "bytes": 35147
+    },
+    "port/config.h": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/components/espeak-ng/config.h",
+      "sha256": "0d3bc88283d2801c350b02dc15daf878e43aa0a161c76703f1e85f1665d1d74b",
+      "bytes": 495
+    },
+    "data/README.md": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/README.md",
+      "sha256": "e5bddb07911eeb3fa6a047e7710256435f9ff102e5af7caf7eda6a9e3a1d264a",
+      "bytes": 904
+    },
+    "data/en_dict": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/en_dict",
+      "sha256": "1053f74a34af38abb6fbd64b7838dacbc655a687c48ce1bb663d364a127b05de",
+      "bytes": 168204
+    },
+    "data/lang/gmw/en": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/lang/gmw/en",
+      "sha256": "4c8f40ba654a18e2e5d7837f55db5df294eba3a731cd861d421ea52516c16677",
+      "bytes": 148
+    },
+    "data/lang/gmw/en-029": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/lang/gmw/en-029",
+      "sha256": "d450cc687501aa1c68466958373f2b3acea7eb7b4be0c4f5d04b02ccaed72b95",
+      "bytes": 355
+    },
+    "data/lang/gmw/en-GB-scotland": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/lang/gmw/en-GB-scotland",
+      "sha256": "adbd70bed8594f2ed878121f49a4bd49a41a6564cd1102fc749f92c72c434617",
+      "bytes": 312
+    },
+    "data/lang/gmw/en-GB-x-gbclan": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/lang/gmw/en-GB-x-gbclan",
+      "sha256": "3d3caf12aa3abeb3e13836dee250e98acff3cd7f08d252559332a6d91bf500c5",
+      "bytes": 252
+    },
+    "data/lang/gmw/en-GB-x-gbcwmd": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/lang/gmw/en-GB-x-gbcwmd",
+      "sha256": "99136e9688eef0ba1ff874f366ee8dff7090e58bd424aa93d22ee2775f16b8c4",
+      "bytes": 200
+    },
+    "data/lang/gmw/en-GB-x-rp": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/lang/gmw/en-GB-x-rp",
+      "sha256": "a305a95506b5deef64faf93428690ddfd14da5f3c3f6a23dd0353ccc563e538a",
+      "bytes": 264
+    },
+    "data/lang/gmw/en-Shaw": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/lang/gmw/en-Shaw",
+      "sha256": "11b887abe5b3fa11c2bb760fcf545bdbbd053666869f18c67e6ea9f10facec44",
+      "bytes": 124
+    },
+    "data/lang/gmw/en-US": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/lang/gmw/en-US",
+      "sha256": "4c5f247313a4206d2d5b2b411b973a007b0617f0633add363a74717aba8d421c",
+      "bytes": 272
+    },
+    "data/lang/gmw/en-US-nyc": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/lang/gmw/en-US-nyc",
+      "sha256": "62b13f9a239fee09b8ddc230a171ebdcd0cd2f14c4b198ebe0b6f9682ba2f372",
+      "bytes": 285
+    },
+    "data/phondata": {
+      "source": "sanoTTS@939d982b9faa54cbcf5d24cc878f5cd514b2646e/mcu/ports/esp32s3/firmware/espeak-ng-data/phondata",
+      "sha256": "fe985d7ed428c3b4f187a5b90c016409259dcea5f35614ff2903e2f9cdb1eeb6",
+      "bytes": 4096
+    },
+    "data/uk_dict": {
+      "source": "FlatSphere previously installed espeak-uk; Piper bundled data",
+      "sha256": "a779bb0f51ce5cebb650a4e2282162fc8c44609210a2baa700f81f3e83e6e10c",
+      "bytes": 3492
+    },
+    "data/phontab": {
+      "source": "FlatSphere previously installed espeak-uk; Piper bundled data",
+      "sha256": "cfee959088c75a2f9a8b78535f34eeea3ed7cac24615a57581ae3a9060de68c2",
+      "bytes": 63700
+    },
+    "data/phonindex": {
+      "source": "FlatSphere previously installed espeak-uk; Piper bundled data",
+      "sha256": "093104ededac06529465db6c51769d0bf8311f9eaec7a0b881599734e40a230e",
+      "bytes": 48584
+    },
+    "data/intonations": {
+      "source": "FlatSphere previously installed espeak-uk; Piper bundled data",
+      "sha256": "c4ff28c76c30cf7d9f07643e08ec39e68769ef648098269b5c0ab7731218e219",
+      "bytes": 2584
+    },
+    "data/lang/zle/uk": {
+      "source": "FlatSphere previously installed espeak-uk; Piper bundled data",
+      "sha256": "df3d1a9f77bac0531e72f87be398d9eb1e903bd6f839d4f04ffec5abb4e34634",
+      "bytes": 97
+    }
+  }
+}

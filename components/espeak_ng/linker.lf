@@ -1,0 +1,5 @@
+# G2P state is touched once per utterance; keep internal SRAM for SIMD weights.
+[mapping:espeak_ng_extram]
+archive: libespeak_ng.a
+entries:
+    * (extram_bss)
