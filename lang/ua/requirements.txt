@@ -1,8 +1,0 @@
-# Versions used for the local Apple Silicon smoke run (Python 3.13).
-numpy==2.5.3
-onnx==1.22.0
-onnxruntime==1.29.0
-piper-tts==1.8.0
-torch==2.14.0
-scipy==1.18.1
-soundfile==0.14.0
