@@ -93,6 +93,13 @@ that selected one falls back to the default voice.
 entry and one `default "<bundle>" if …` line in `Kconfig` (plus the
 `FLATSPHERE_TTS_LANG_UK` condition if it is Ukrainian). No CMake changes needed.
 
+Other languages are not trained in this repository. Distill them with the
+upstream [sanoTTS trainer](https://github.com/Ampixa/sanoTTS) from a Piper/VITS
+teacher, following the
+[language-porting recipe](https://github.com/Ampixa/sanoTTS/blob/master/docs/roota-language-porting-recipe.md),
+then export an int8 bundle and install it as above. G2P selection and the
+vendored eSpeak data currently cover only `en` and `uk`.
+
 User-observed playback is not numerical acceptance.
 
 | Bundle | Existing source | Host correlation | Status |

@@ -162,6 +162,14 @@ Serhiy passes listening review but not the numeric int8 parity gate; its model
 card and samples are at
 [huggingface.co/dmytro-m/ua-serhiy-0p58m](https://huggingface.co/dmytro-m/ua-serhiy-0p58m).
 
+English and Ukrainian are the voices shipped here. Further languages can be
+distilled the same way with the upstream
+[sanoTTS trainer](https://github.com/Ampixa/sanoTTS) from a Piper/VITS teacher,
+using the
+[language-porting recipe](https://github.com/Ampixa/sanoTTS/blob/master/docs/roota-language-porting-recipe.md).
+This tree does not include the trainer. A new language also needs its eSpeak
+dictionary: the vendored G2P data currently covers only English and Ukrainian.
+
 Both speech engines are vendored local components: no registry eSpeak package
 or build-time source download is needed. Ukrainian-voice firmware builds with
 ESP-IDF 5.5.4 (38% app partition free). See
