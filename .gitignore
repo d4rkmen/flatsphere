@@ -2,3 +2,5 @@ build
 .vscode
 managed_components
 drafts
+.cache
+tests   
