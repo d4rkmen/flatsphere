@@ -146,6 +146,20 @@ idf.py build
 idf.py -p /dev/ttyUSB0 flash monitor
 ```
 
+`idf.py build` also merges the bootloader, partition table, factory NVS,
+application and eSpeak data into `build/flatsphere_full.bin`:
+
+```bash
+esptool --chip esp32s3 merge_bin --output build/flatsphere_full.bin \
+  0x0 build/bootloader/bootloader.bin \
+  0x8000 build/partition_table/partition-table.bin \
+  0x9000 build/nvs.bin \
+  0x10000 build/flatsphere.bin \
+  0x410000 build/espeak.bin
+```
+
+Flash that bundle at `0x0`. It includes factory settings from `nvs.csv`.
+
 ### Configuration
 
 Use `idf.py menuconfig` to configure project settings.
